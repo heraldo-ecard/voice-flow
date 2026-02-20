@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "../stores/settingsStore";
-import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Moon, Power } from "lucide-react";
+import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Moon, Power, Zap } from "lucide-react";
 
 const inputStyle: React.CSSProperties = {
   background: "var(--color-input-bg)",
@@ -33,6 +33,7 @@ export default function Settings() {
     hotkey,
     darkMode,
     autostart,
+    rawMode,
     loading,
     setApiKey,
     setSetting,
@@ -148,10 +149,22 @@ export default function Settings() {
           onFocus={focusHandler}
           onBlur={blurHandler}
         >
-          <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
-          <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
-          <option value="gemma2-9b-it">Gemma 2 9B</option>
-          <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+          <optgroup label="Production — Meta">
+            <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
+            <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
+          </optgroup>
+          <optgroup label="Production — OpenAI GPT-OSS">
+            <option value="openai/gpt-oss-120b">GPT-OSS 120B</option>
+            <option value="openai/gpt-oss-20b">GPT-OSS 20B</option>
+          </optgroup>
+          <optgroup label="Preview — Meta Llama 4">
+            <option value="meta-llama/llama-4-maverick-17b-128e-instruct">Llama 4 Maverick 17B</option>
+            <option value="meta-llama/llama-4-scout-17b-16e-instruct">Llama 4 Scout 17B</option>
+          </optgroup>
+          <optgroup label="Preview — Outros">
+            <option value="qwen/qwen3-32b">Qwen 3 32B</option>
+            <option value="moonshotai/kimi-k2-instruct-0905">Kimi K2</option>
+          </optgroup>
         </select>
       </section>
 
@@ -237,6 +250,32 @@ export default function Settings() {
             <span
               className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
               style={{ transform: autostart ? "translateX(20px)" : "none" }}
+            />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4" style={{ color: "var(--color-warning)" }} />
+            <div>
+              <span className="font-semibold text-sm">Raw Mode</span>
+              <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                Skip LLM — inject Whisper output directly
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSetting("raw_mode", String(!rawMode))}
+            className="relative w-11 h-6 rounded-full transition-colors duration-150"
+            style={{
+              background: rawMode
+                ? "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
+                : "rgba(100, 116, 139, 0.3)",
+            }}
+          >
+            <span
+              className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
+              style={{ transform: rawMode ? "translateX(20px)" : "none" }}
             />
           </button>
         </div>
