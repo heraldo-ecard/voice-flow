@@ -24,7 +24,7 @@
 
 ## Why VoiceFlow?
 
-Commercial voice dictation tools like [Wispr Flow](https://wispr.com) cost **$10-20/month** with no transparency on what happens with your audio. VoiceFlow gives you the same experience — **for free**.
+Commercial voice dictation tools like [Wispr Flow](https://wispr.com) cost **$24-30/month** with no transparency on what happens with your audio. VoiceFlow gives you the same experience — **for free**.
 
 - **100% open source** — audit every line of code
 - **Your API key, your data** — audio goes directly to Groq, nowhere else

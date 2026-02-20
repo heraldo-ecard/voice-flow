@@ -100,6 +100,34 @@ Hotkey release
 - **Colors:** Navy dark theme (#0A1628/#0F2040) and light theme (#F8FAFC/#FFFFFF). Brand blue gradient: #1E6FFF → #06B6D4.
 - **All styling via CSS variables** (`--color-bg`, `--color-surface`, `--color-brand`, etc.) that swap between light/dark via `[data-theme="dark"]`.
 
+## Versioning & Commits
+
+**All commits MUST follow [Conventional Commits](https://www.conventionalcommits.org/):**
+
+```
+feat: add custom hotkey configuration      → minor bump (0.2.0 → 0.3.0)
+fix: resolve audio capture on Linux        → patch bump (0.2.0 → 0.2.1)
+chore: update dependencies                 → no version bump
+docs: update README                        → no version bump
+refactor: simplify pipeline orchestration   → no version bump
+perf: reduce STT latency by batching       → patch bump
+```
+
+**Version lives in 3 files** (must stay in sync):
+- `package.json` → `"version"`
+- `src-tauri/Cargo.toml` → `version`
+- `src-tauri/tauri.conf.json` → `"version"`
+
+**Bump all at once:** `bash scripts/bump-version.sh 0.3.0`
+
+**Release flow:**
+```bash
+bash scripts/bump-version.sh X.Y.Z
+git add -A && git commit -m "chore: bump version to vX.Y.Z"
+git tag vX.Y.Z
+npx tauri build
+```
+
 ## Environment
 
 - Rust MSRV: 1.80.0 (for `LazyLock`)
