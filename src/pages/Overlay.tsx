@@ -1,14 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/core";
 
 const BAR_COUNT = 18;
 
 export default function Overlay() {
   const [state, setState] = useState<string>("recording");
   const [levels, setLevels] = useState<number[]>(new Array(BAR_COUNT).fill(0));
+  const [isDark, setIsDark] = useState(true);
   const levelsRef = useRef(levels);
 
   useEffect(() => {
+    // Load theme from settings
+    invoke<string | null>("get_setting", { key: "dark_mode" }).then((val) => {
+      setIsDark(val === "true");
+    }).catch(() => {});
+
     const unlisteners: Array<() => void> = [];
 
     async function setup() {
@@ -35,6 +42,11 @@ export default function Overlay() {
   const isRecording = state === "recording";
   const isProcessing = ["encoding", "transcribing", "refining", "injecting"].includes(state);
 
+  const pillBg = isDark ? "rgba(10, 22, 40, 0.92)" : "rgba(255, 255, 255, 0.92)";
+  const pillBorder = isDark ? "rgba(30, 111, 255, 0.20)" : "rgba(30, 111, 255, 0.15)";
+  const pillShadow = isDark ? "none" : "0 2px 12px rgba(0, 0, 0, 0.12)";
+  const processingTextColor = isDark ? "rgba(203, 213, 225, 0.7)" : "rgba(71, 85, 105, 0.8)";
+
   return (
     <div
       className="w-full h-full flex items-center justify-center select-none"
@@ -46,9 +58,10 @@ export default function Overlay() {
         style={{
           width: 138,
           height: 32,
-          background: "rgba(10, 22, 40, 0.92)",
+          background: pillBg,
           backdropFilter: "blur(12px)",
-          border: "1px solid rgba(30, 111, 255, 0.20)",
+          border: `1px solid ${pillBorder}`,
+          boxShadow: pillShadow,
         }}
       >
         {isRecording && (
@@ -64,7 +77,7 @@ export default function Overlay() {
                   className="w-[1.5px] rounded-full transition-all duration-75"
                   style={{
                     height: `${Math.max(2, Math.min(16, level * 160))}px`,
-                    background: `linear-gradient(to top, #1E6FFF, #06B6D4)`,
+                    background: "linear-gradient(to top, #1E6FFF, #06B6D4)",
                     opacity: 0.6 + Math.min(0.4, level * 4),
                   }}
                 />
@@ -90,7 +103,7 @@ export default function Overlay() {
             </div>
             <span
               className="text-[10px] font-medium leading-none"
-              style={{ color: "rgba(203, 213, 225, 0.7)", fontFamily: "'DM Sans', sans-serif" }}
+              style={{ color: processingTextColor, fontFamily: "'DM Sans', sans-serif" }}
             >
               Processing
             </span>

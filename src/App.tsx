@@ -120,10 +120,10 @@ function AppContent() {
 export default function App() {
   const windowLabel = getCurrentWindow().label;
   if (windowLabel === "overlay") {
-    document.documentElement.style.background = "transparent";
-    document.body.style.background = "transparent";
     return <Overlay />;
   }
 
+  // Main window: apply themed background to body
+  document.body.classList.add("main-window");
   return <AppContent />;
 }
