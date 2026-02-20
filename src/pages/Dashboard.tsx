@@ -9,6 +9,53 @@ import { Search, Mic, Zap } from "lucide-react";
 import { useSettingsStore } from "../stores/settingsStore";
 import type { Transcription, TranscriptionStats } from "../types";
 
+const RECORD_CONFIG = {
+  recording: {
+    label: "Stop",
+    style: { background: "var(--color-error)" } as React.CSSProperties,
+    className:
+      "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150",
+  },
+  idle: {
+    label: "Record",
+    style: {
+      background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)",
+    } as React.CSSProperties,
+    className:
+      "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150 hover-lift",
+  },
+  processing: {
+    label: "Processing...",
+    style: {
+      background: "var(--color-text-muted)",
+      cursor: "not-allowed",
+    } as React.CSSProperties,
+    className:
+      "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150",
+  },
+};
+
+interface RecordButtonProps {
+  pipelineState: string;
+  onClick: () => void;
+}
+
+function RecordButton({ pipelineState, onClick }: RecordButtonProps) {
+  const key = pipelineState === "idle" || pipelineState === "recording" ? pipelineState : "processing";
+  const config = RECORD_CONFIG[key];
+  return (
+    <button
+      onClick={onClick}
+      disabled={key === "processing"}
+      className={config.className}
+      style={config.style}
+    >
+      <Mic className="w-4 h-4" />
+      {config.label}
+    </button>
+  );
+}
+
 export default function Dashboard() {
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([]);
   const [stats, setStats] = useState<TranscriptionStats | null>(null);
@@ -105,35 +152,20 @@ export default function Dashboard() {
             disabled={pipelineState !== "idle"}
             title={rawMode ? "Fast Mode on — skipping LLM refinement" : "Fast Mode off — LLM refinement active"}
             className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
-            style={
-              rawMode
-                ? { background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)", color: "#1a1a1a" }
-                : { background: "transparent", border: "1px solid var(--color-border)", color: "var(--color-text-muted)" }
-            }
+            style={{
+              background: rawMode
+                ? "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
+                : "transparent",
+              border: "1px solid",
+              borderColor: rawMode ? "transparent" : "var(--color-border)",
+              color: rawMode ? "#1a1a1a" : "var(--color-text-muted)",
+            }}
           >
             <Zap className="w-3.5 h-3.5" />
             Fast
           </button>
 
-          <button
-            onClick={handleRecord}
-            disabled={pipelineState !== "idle" && pipelineState !== "recording"}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150${pipelineState === "idle" ? " hover-lift" : ""}`}
-          style={
-            pipelineState === "recording"
-              ? { background: "var(--color-error)" }
-              : pipelineState === "idle"
-                ? { background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)" }
-                : { background: "var(--color-text-muted)", cursor: "not-allowed" }
-          }
-        >
-          <Mic className="w-4 h-4" />
-          {pipelineState === "recording"
-            ? "Stop"
-            : pipelineState === "idle"
-              ? "Record"
-              : "Processing..."}
-          </button>
+          <RecordButton pipelineState={pipelineState} onClick={handleRecord} />
         </div>
       </div>
 

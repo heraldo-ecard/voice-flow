@@ -24,6 +24,31 @@ const cardStyle: React.CSSProperties = {
   boxShadow: "0 1px 3px var(--color-shadow-base)",
 };
 
+interface ToggleProps {
+  checked: boolean;
+  onChange: () => void;
+  activeGradient?: string;
+}
+
+function Toggle({
+  checked,
+  onChange,
+  activeGradient = "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)",
+}: ToggleProps) {
+  return (
+    <button
+      onClick={onChange}
+      className="relative w-11 h-6 rounded-full transition-colors duration-150"
+      style={{ background: checked ? activeGradient : "rgba(100, 116, 139, 0.3)" }}
+    >
+      <span
+        className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
+        style={{ transform: checked ? "translateX(20px)" : "none" }}
+      />
+    </button>
+  );
+}
+
 export default function Settings() {
   const {
     apiKey,
@@ -199,20 +224,7 @@ export default function Settings() {
             <Moon className="w-4 h-4" style={{ color: "var(--color-brand-cyan)" }} />
             <span className="font-semibold text-sm">Dark Mode</span>
           </div>
-          <button
-            onClick={toggleDarkMode}
-            className="relative w-11 h-6 rounded-full transition-colors duration-150"
-            style={{
-              background: darkMode
-                ? "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)"
-                : "rgba(100, 116, 139, 0.3)",
-            }}
-          >
-            <span
-              className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
-              style={{ transform: darkMode ? "translateX(20px)" : "none" }}
-            />
-          </button>
+          <Toggle checked={darkMode} onChange={toggleDarkMode} />
         </div>
 
         <div className="flex items-center justify-between">
@@ -220,20 +232,10 @@ export default function Settings() {
             <Power className="w-4 h-4" style={{ color: "var(--color-success)" }} />
             <span className="font-semibold text-sm">Start with OS</span>
           </div>
-          <button
-            onClick={() => setSetting("autostart", String(!autostart))}
-            className="relative w-11 h-6 rounded-full transition-colors duration-150"
-            style={{
-              background: autostart
-                ? "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)"
-                : "rgba(100, 116, 139, 0.3)",
-            }}
-          >
-            <span
-              className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
-              style={{ transform: autostart ? "translateX(20px)" : "none" }}
-            />
-          </button>
+          <Toggle
+            checked={autostart}
+            onChange={() => setSetting("autostart", String(!autostart))}
+          />
         </div>
 
         <div className="flex items-center justify-between">
@@ -246,20 +248,11 @@ export default function Settings() {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setSetting("raw_mode", String(!rawMode))}
-            className="relative w-11 h-6 rounded-full transition-colors duration-150"
-            style={{
-              background: rawMode
-                ? "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
-                : "rgba(100, 116, 139, 0.3)",
-            }}
-          >
-            <span
-              className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
-              style={{ transform: rawMode ? "translateX(20px)" : "none" }}
-            />
-          </button>
+          <Toggle
+            checked={rawMode}
+            onChange={() => setSetting("raw_mode", String(!rawMode))}
+            activeGradient="linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)"
+          />
         </div>
       </section>
     </div>

@@ -81,7 +81,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setSetting: async (key: string, value: string) => {
     await invoke("set_setting", { key, value });
 
-    const fieldMap: Record<string, string> = {
+    type BooleanField = "darkMode" | "autostart" | "rawMode";
+    type SettingField = BooleanField | "sttModel" | "llmModel" | "language" | "hotkey";
+
+    const BACKEND_TO_STATE: Record<string, SettingField> = {
       stt_model: "sttModel",
       llm_model: "llmModel",
       language: "language",
@@ -90,13 +93,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       autostart: "autostart",
       raw_mode: "rawMode",
     };
+    const BOOLEAN_FIELDS = new Set<BooleanField>(["darkMode", "autostart", "rawMode"]);
 
-    const field = fieldMap[key];
+    const field = BACKEND_TO_STATE[key];
     if (field) {
-      const parsed =
-        field === "darkMode" || field === "autostart" || field === "rawMode"
-          ? value === "true"
-          : value;
+      const parsed = BOOLEAN_FIELDS.has(field as BooleanField) ? value === "true" : value;
       set({ [field]: parsed } as Partial<SettingsState>);
     }
   },
