@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { HashRouter, Routes, Route, NavLink } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { LayoutDashboard, Settings as SettingsIcon } from "lucide-react";
 import Dashboard from "./pages/Dashboard";
@@ -41,7 +41,7 @@ function AppContent() {
   }
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
         {/* Sidebar */}
         <nav className="w-14 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-4 gap-2">
@@ -82,7 +82,7 @@ function AppContent() {
         </main>
       </div>
       <Toaster position="bottom-right" />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

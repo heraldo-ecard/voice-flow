@@ -60,7 +60,10 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
     // 1. Stop recording and get samples
     let (samples, sample_rate) = {
         let state = app.state::<AppState>();
-        let mut audio = state.audio.lock().unwrap();
+        let mut audio = state
+            .audio
+            .lock()
+            .map_err(|e| VoiceFlowError::Pipeline(format!("Audio lock poisoned: {}", e)))?;
         audio.stop_recording()?
     };
 
@@ -72,18 +75,21 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
     emit_state(app, PipelineState::Encoding);
     let wav_data = encoder::encode_wav(&samples, sample_rate)?;
 
-    // 3. Get settings
-    let (api_key, stt_model, llm_model, language) = {
+    // 3. Get settings - API key always from keychain, other settings from DB
+    let api_key = crate::keychain::get_api_key().unwrap_or_default();
+
+    if api_key.is_empty() {
+        return Err(VoiceFlowError::Pipeline(
+            "No API key configured. Set it in Settings.".into(),
+        ));
+    }
+
+    let (stt_model, llm_model, language) = {
         let state = app.state::<AppState>();
-        let db = state.db.lock().unwrap();
-        let api_key = db
-            .get_setting("api_key")
-            .ok()
-            .flatten()
-            .or_else(|| {
-                crate::keychain::get_api_key().ok()
-            })
-            .unwrap_or_default();
+        let db = state
+            .db
+            .lock()
+            .map_err(|e| VoiceFlowError::Pipeline(format!("DB lock poisoned: {}", e)))?;
         let stt_model = db
             .get_setting("stt_model")
             .ok()
@@ -99,14 +105,8 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
             .ok()
             .flatten()
             .unwrap_or_else(|| "pt".to_string());
-        (api_key, stt_model, llm_model, language)
+        (stt_model, llm_model, language)
     };
-
-    if api_key.is_empty() {
-        return Err(VoiceFlowError::Pipeline(
-            "No API key configured. Set it in Settings.".into(),
-        ));
-    }
 
     // 4. Transcribe
     emit_state(app, PipelineState::Transcribing);
@@ -124,17 +124,23 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
     let refined_text = groq::refine(&api_key, &raw_text, &llm_model).await?;
     let llm_latency = t_llm.elapsed().as_millis() as u64;
 
-    // 6. Inject text
+    // 6. Inject text into the currently focused input field
     emit_state(app, PipelineState::Injecting);
     injector::inject_text(&refined_text)?;
 
     let total_latency = t_start.elapsed().as_millis() as u64;
 
-    // 7. Save to database
+    // 7. Save to database (log errors instead of silently ignoring)
     {
         let state = app.state::<AppState>();
-        let db = state.db.lock().unwrap();
-        let _ = db.save_transcription(&raw_text, &refined_text, stt_latency, llm_latency);
+        let db_result = state.db.lock();
+        if let Ok(db) = db_result {
+            if let Err(e) =
+                db.save_transcription(&raw_text, &refined_text, stt_latency, llm_latency)
+            {
+                log::error!("Failed to save transcription to DB: {}", e);
+            }
+        }
     }
 
     let result = PipelineResult {

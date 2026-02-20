@@ -7,6 +7,7 @@ use tauri::{
 
 use crate::errors::{Result, VoiceFlowError};
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TrayState {
     Idle,
@@ -50,6 +51,7 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon> {
     Ok(tray)
 }
 
+#[allow(dead_code)]
 pub fn update_tray_state(tray: &TrayIcon, _app: &AppHandle, state: TrayState) -> Result<()> {
     let tooltip = match state {
         TrayState::Idle => "VoiceFlow - Idle",

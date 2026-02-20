@@ -1,9 +1,20 @@
 use reqwest::multipart;
 use serde::Deserialize;
+use std::sync::LazyLock;
+use std::time::Duration;
 
 use crate::errors::{Result, VoiceFlowError};
 
 const GROQ_BASE_URL: &str = "https://api.groq.com/openai/v1";
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// Shared HTTP client with connection pooling and timeout.
+static HTTP_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+    reqwest::Client::builder()
+        .timeout(REQUEST_TIMEOUT)
+        .build()
+        .expect("Failed to build HTTP client")
+});
 
 #[derive(Debug, Deserialize)]
 struct ChatResponse {
@@ -27,8 +38,6 @@ pub async fn transcribe(
     model: &str,
     language: &str,
 ) -> Result<String> {
-    let client = reqwest::Client::new();
-
     let file_part = multipart::Part::bytes(wav_data)
         .file_name("audio.wav")
         .mime_str("audio/wav")
@@ -40,7 +49,7 @@ pub async fn transcribe(
         .text("language", language.to_string())
         .text("response_format", "text".to_string());
 
-    let resp = client
+    let resp = HTTP_CLIENT
         .post(format!("{}/audio/transcriptions", GROQ_BASE_URL))
         .header("Authorization", format!("Bearer {}", api_key))
         .multipart(form)
@@ -62,8 +71,6 @@ pub async fn transcribe(
 
 /// Refine raw transcription using Groq LLM.
 pub async fn refine(api_key: &str, raw_text: &str, model: &str) -> Result<String> {
-    let client = reqwest::Client::new();
-
     let payload = serde_json::json!({
         "model": model,
         "messages": [
@@ -80,10 +87,9 @@ pub async fn refine(api_key: &str, raw_text: &str, model: &str) -> Result<String
         "max_tokens": 2048
     });
 
-    let resp = client
+    let resp = HTTP_CLIENT
         .post(format!("{}/chat/completions", GROQ_BASE_URL))
         .header("Authorization", format!("Bearer {}", api_key))
-        .header("Content-Type", "application/json")
         .json(&payload)
         .send()
         .await?;

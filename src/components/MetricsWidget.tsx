@@ -1,17 +1,8 @@
 import { MessageSquare, Clock, TrendingUp, Calendar } from "lucide-react";
-
-interface Stats {
-  total_transcriptions: number;
-  total_words: number;
-  words_today: number;
-  words_this_week: number;
-  words_this_month: number;
-  avg_stt_latency_ms: number;
-  avg_llm_latency_ms: number;
-}
+import type { TranscriptionStats } from "../types";
 
 interface Props {
-  stats: Stats;
+  stats: TranscriptionStats;
 }
 
 export default function MetricsWidget({ stats }: Props) {

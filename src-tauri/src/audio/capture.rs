@@ -8,18 +8,21 @@ use crate::errors::{Result, VoiceFlowError};
 type SampleBuffer = Arc<Mutex<Vec<f32>>>;
 
 /// Audio recording state. The cpal Stream is managed on a dedicated thread
-/// because it is not Send+Sync.
+/// (because cpal Stream is not Send+Sync), controlled via channels.
+/// All fields of AudioState itself are Send+Sync.
 pub struct AudioState {
     samples: SampleBuffer,
     recording: Arc<std::sync::atomic::AtomicBool>,
     sample_rate: u32,
     stop_signal: Option<std::sync::mpsc::Sender<()>>,
+    join_handle: Option<std::thread::JoinHandle<()>>,
 }
 
-// Safety: AudioState no longer holds the cpal Stream directly.
-// The Stream lives on a dedicated thread and is controlled via channels.
-unsafe impl Send for AudioState {}
-unsafe impl Sync for AudioState {}
+impl Default for AudioState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 impl AudioState {
     pub fn new() -> Self {
@@ -28,6 +31,7 @@ impl AudioState {
             recording: Arc::new(std::sync::atomic::AtomicBool::new(false)),
             sample_rate: 0,
             stop_signal: None,
+            join_handle: None,
         }
     }
 
@@ -41,8 +45,7 @@ impl AudioState {
         }
 
         // Clear previous samples
-        {
-            let mut samples = self.samples.lock().unwrap();
+        if let Ok(mut samples) = self.samples.lock() {
             samples.clear();
         }
 
@@ -67,17 +70,19 @@ impl AudioState {
         recording.store(true, std::sync::atomic::Ordering::Relaxed);
 
         // Spawn a dedicated thread for the audio stream
-        std::thread::spawn(move || {
+        let handle = std::thread::spawn(move || {
             let stream = match sample_format {
                 SampleFormat::F32 => {
                     let samples = samples.clone();
                     device.build_input_stream(
                         &config.into(),
                         move |data: &[f32], _: &cpal::InputCallbackInfo| {
-                            let mut buf = samples.lock().unwrap();
-                            for chunk in data.chunks(channels) {
-                                let mono: f32 = chunk.iter().sum::<f32>() / channels as f32;
-                                buf.push(mono);
+                            if let Ok(mut buf) = samples.lock() {
+                                for chunk in data.chunks(channels) {
+                                    let mono: f32 =
+                                        chunk.iter().sum::<f32>() / channels as f32;
+                                    buf.push(mono);
+                                }
                             }
                         },
                         |err| log::error!("Audio stream error: {}", err),
@@ -89,12 +94,15 @@ impl AudioState {
                     device.build_input_stream(
                         &config.into(),
                         move |data: &[i16], _: &cpal::InputCallbackInfo| {
-                            let mut buf = samples.lock().unwrap();
-                            for chunk in data.chunks(channels) {
-                                let mono: f32 =
-                                    chunk.iter().map(|&s| s as f32 / 32768.0).sum::<f32>()
+                            if let Ok(mut buf) = samples.lock() {
+                                for chunk in data.chunks(channels) {
+                                    let mono: f32 = chunk
+                                        .iter()
+                                        .map(|&s| s as f32 / 32768.0)
+                                        .sum::<f32>()
                                         / channels as f32;
-                                buf.push(mono);
+                                    buf.push(mono);
+                                }
                             }
                         },
                         |err| log::error!("Audio stream error: {}", err),
@@ -129,6 +137,7 @@ impl AudioState {
             }
         });
 
+        self.join_handle = Some(handle);
         log::info!("Recording started at {} Hz", self.sample_rate);
         Ok(())
     }
@@ -139,12 +148,15 @@ impl AudioState {
             let _ = stop_tx.send(());
         }
 
-        // Wait briefly for the thread to finish
-        std::thread::sleep(std::time::Duration::from_millis(50));
+        // Wait for the recording thread to finish (proper join, no arbitrary sleep)
+        if let Some(handle) = self.join_handle.take() {
+            let _ = handle.join();
+        }
 
-        let samples = {
-            let mut buf = self.samples.lock().unwrap();
+        let samples = if let Ok(mut buf) = self.samples.lock() {
             std::mem::take(&mut *buf)
+        } else {
+            Vec::new()
         };
 
         log::info!("Recording stopped, {} samples captured", samples.len());

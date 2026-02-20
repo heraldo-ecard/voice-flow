@@ -28,22 +28,27 @@ pub fn run() {
             None,
         ))
         .setup(|app| {
-            if cfg!(debug_assertions) {
-                app.handle().plugin(
-                    tauri_plugin_log::Builder::default()
-                        .level(log::LevelFilter::Info)
-                        .build(),
-                )?;
-            }
+            // Enable logging in all builds (Info for debug, Warn for release)
+            let log_level = if cfg!(debug_assertions) {
+                log::LevelFilter::Info
+            } else {
+                log::LevelFilter::Warn
+            };
+            app.handle().plugin(
+                tauri_plugin_log::Builder::default()
+                    .level(log_level)
+                    .build(),
+            )?;
 
-            // Initialize database
+            // Initialize database (safe path handling for non-UTF8 paths)
             let app_dir = app
                 .path()
                 .app_data_dir()
                 .expect("Failed to get app data dir");
             std::fs::create_dir_all(&app_dir)?;
             let db_path = app_dir.join("voiceflow.db");
-            let db = Database::new(db_path.to_str().unwrap())
+            let db_path_str = db_path.to_string_lossy();
+            let db = Database::new(&db_path_str)
                 .expect("Failed to initialize database");
 
             // Seed API key from environment variable if not already in keychain
@@ -62,12 +67,11 @@ pub fn run() {
                 db: Mutex::new(db),
             });
 
-            // Create system tray
-            let _tray = tray::create_tray(app.handle())
-                .unwrap_or_else(|e| {
-                    log::error!("Failed to create tray: {}", e);
-                    panic!("Tray creation failed");
-                });
+            // Create system tray (graceful fallback if tray unavailable)
+            match tray::create_tray(app.handle()) {
+                Ok(_tray) => log::info!("System tray created"),
+                Err(e) => log::warn!("Tray unavailable, continuing without it: {}", e),
+            }
 
             // Register hotkeys
             hotkey::register_hotkeys(app.handle())

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { usePipelineStore } from "../stores/pipelineStore";
 import TranscriptionCard from "../components/TranscriptionCard";
@@ -6,32 +6,13 @@ import MetricsWidget from "../components/MetricsWidget";
 import CostTracker from "../components/CostTracker";
 import RecordingIndicator from "../components/RecordingIndicator";
 import { Search, Mic } from "lucide-react";
-
-interface Transcription {
-  id: string;
-  raw_text: string;
-  refined_text: string;
-  stt_latency_ms: number;
-  llm_latency_ms: number;
-  word_count: number;
-  created_at: string;
-}
-
-interface Stats {
-  total_transcriptions: number;
-  total_words: number;
-  words_today: number;
-  words_this_week: number;
-  words_this_month: number;
-  avg_stt_latency_ms: number;
-  avg_llm_latency_ms: number;
-}
+import type { Transcription, TranscriptionStats } from "../types";
 
 export default function Dashboard() {
   const [transcriptions, setTranscriptions] = useState<Transcription[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats, setStats] = useState<TranscriptionStats | null>(null);
   const [search, setSearch] = useState("");
-  const [offset, setOffset] = useState(0);
+  const offsetRef = useRef(0);
   const [hasMore, setHasMore] = useState(true);
   const pipelineState = usePipelineStore((s) => s.state);
   const lastResult = usePipelineStore((s) => s.lastResult);
@@ -41,30 +22,30 @@ export default function Dashboard() {
   const loadTranscriptions = useCallback(
     async (reset = false) => {
       try {
-        const newOffset = reset ? 0 : offset;
+        const currentOffset = reset ? 0 : offsetRef.current;
         const items = await invoke<Transcription[]>("get_transcriptions", {
           limit: LIMIT,
-          offset: newOffset,
+          offset: currentOffset,
           search: search || null,
         });
         if (reset) {
           setTranscriptions(items);
-          setOffset(LIMIT);
+          offsetRef.current = LIMIT;
         } else {
           setTranscriptions((prev) => [...prev, ...items]);
-          setOffset(newOffset + LIMIT);
+          offsetRef.current = currentOffset + LIMIT;
         }
         setHasMore(items.length === LIMIT);
       } catch (err) {
         console.error("Failed to load transcriptions:", err);
       }
     },
-    [offset, search],
+    [search],
   );
 
   const loadStats = useCallback(async () => {
     try {
-      const s = await invoke<Stats>("get_stats");
+      const s = await invoke<TranscriptionStats>("get_stats");
       setStats(s);
     } catch (err) {
       console.error("Failed to load stats:", err);
@@ -74,7 +55,7 @@ export default function Dashboard() {
   useEffect(() => {
     loadTranscriptions(true);
     loadStats();
-  }, []);
+  }, [loadTranscriptions, loadStats]);
 
   // Reload when a new transcription arrives
   useEffect(() => {
@@ -82,7 +63,7 @@ export default function Dashboard() {
       loadTranscriptions(true);
       loadStats();
     }
-  }, [lastResult]);
+  }, [lastResult, loadTranscriptions, loadStats]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -174,7 +155,7 @@ export default function Dashboard() {
             <Mic className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>No transcriptions yet.</p>
             <p className="text-sm">
-              Press <kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+Shift+Space</kbd> or click Record to start.
+              Hold <kbd className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl+Shift+Space</kbd> to record, release to process.
             </p>
           </div>
         ) : (

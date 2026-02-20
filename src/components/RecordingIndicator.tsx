@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Mic, Loader2 } from "lucide-react";
 import type { PipelineState } from "../stores/pipelineStore";
 
@@ -15,6 +16,12 @@ const stateLabels: Record<PipelineState, string> = {
 };
 
 export default function RecordingIndicator({ state }: Props) {
+  // Compute bar heights once (deterministic, no re-render jitter)
+  const barHeights = useMemo(
+    () => Array.from({ length: 5 }, (_, i) => 8 + ((i * 7 + 3) % 16)),
+    [],
+  );
+
   if (state === "idle") return null;
 
   const isRecording = state === "recording";
@@ -39,12 +46,12 @@ export default function RecordingIndicator({ state }: Props) {
 
       {isRecording && (
         <div className="flex items-center gap-0.5 ml-auto">
-          {[...Array(5)].map((_, i) => (
+          {barHeights.map((h, i) => (
             <div
               key={i}
               className="w-1 bg-red-400 rounded-full animate-pulse"
               style={{
-                height: `${8 + Math.random() * 16}px`,
+                height: `${h}px`,
                 animationDelay: `${i * 0.15}s`,
               }}
             />

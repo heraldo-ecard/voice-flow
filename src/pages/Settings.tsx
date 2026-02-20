@@ -12,7 +12,6 @@ export default function Settings() {
     darkMode,
     autostart,
     loading,
-    loadSettings,
     setApiKey,
     setSetting,
     toggleDarkMode,
@@ -21,9 +20,7 @@ export default function Settings() {
   const [localApiKey, setLocalApiKey] = useState("");
   const [showKey, setShowKey] = useState(false);
 
-  useEffect(() => {
-    loadSettings();
-  }, [loadSettings]);
+  // Settings are already loaded by AppContent; no need to reload here.
 
   useEffect(() => {
     setLocalApiKey(apiKey);

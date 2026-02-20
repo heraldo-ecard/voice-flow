@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { Copy, Trash2, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import toast from "react-hot-toast";
-
-interface Transcription {
-  id: string;
-  raw_text: string;
-  refined_text: string;
-  stt_latency_ms: number;
-  llm_latency_ms: number;
-  word_count: number;
-  created_at: string;
-}
+import type { Transcription } from "../types";
 
 interface Props {
   transcription: Transcription;
@@ -20,9 +11,13 @@ interface Props {
 export default function TranscriptionCard({ transcription, onDelete }: Props) {
   const [showRaw, setShowRaw] = useState(false);
 
-  const copyText = () => {
-    navigator.clipboard.writeText(transcription.refined_text);
-    toast.success("Copied to clipboard");
+  const copyText = async () => {
+    try {
+      await navigator.clipboard.writeText(transcription.refined_text);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Failed to copy");
+    }
   };
 
   const totalLatency = transcription.stt_latency_ms + transcription.llm_latency_ms;
