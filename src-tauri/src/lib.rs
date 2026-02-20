@@ -19,6 +19,8 @@ pub struct AppState {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Load .env file if present
+    let _ = dotenvy::dotenv();
     tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
@@ -43,6 +45,16 @@ pub fn run() {
             let db_path = app_dir.join("voiceflow.db");
             let db = Database::new(db_path.to_str().unwrap())
                 .expect("Failed to initialize database");
+
+            // Seed API key from environment variable if not already in keychain
+            if keychain::get_api_key().is_err() {
+                if let Ok(env_key) = std::env::var("GROQ_API_KEY") {
+                    if !env_key.is_empty() {
+                        let _ = keychain::set_api_key(&env_key);
+                        log::info!("API key loaded from GROQ_API_KEY env var");
+                    }
+                }
+            }
 
             // Set up app state
             app.manage(AppState {
