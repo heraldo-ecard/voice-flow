@@ -70,13 +70,19 @@ pub async fn transcribe(
 }
 
 /// Refine raw transcription using Groq LLM.
-pub async fn refine(api_key: &str, raw_text: &str, model: &str) -> Result<String> {
+pub async fn refine(
+    api_key: &str,
+    raw_text: &str,
+    model: &str,
+    language: &str,
+) -> Result<String> {
+    let system_prompt = build_refine_prompt(language);
     let payload = serde_json::json!({
         "model": model,
         "messages": [
             {
                 "role": "system",
-                "content": "You are a dictation assistant. The user will give you raw speech-to-text output. Fix grammar, punctuation, and remove filler words. Keep the original meaning and language intact. Return ONLY the corrected text, nothing else."
+                "content": system_prompt
             },
             {
                 "role": "user",
@@ -111,4 +117,34 @@ pub async fn refine(api_key: &str, raw_text: &str, model: &str) -> Result<String
         .unwrap_or_default();
 
     Ok(content.trim().to_string())
+}
+
+/// Build a language-aware system prompt for text refinement.
+fn build_refine_prompt(language: &str) -> String {
+    let base = "You are a dictation assistant for a software developer. \
+        The user will give you raw speech-to-text output. \
+        Fix grammar, punctuation, capitalization, and remove filler words (uh, um, like, né, tipo, então). \
+        Keep the original meaning intact. Return ONLY the corrected text, nothing else.";
+
+    let lang_hint = match language {
+        "pt" => "\nThe user speaks Brazilian Portuguese but frequently uses English technical terms \
+            (e.g. deploy, commit, pull request, branch, merge, frontend, backend, API, endpoint, \
+            framework, runtime, build, pipeline, sprint, refactor, debug, cloud, cluster, container, \
+            callback, middleware, hook, state, props, component, token, socket, stream, buffer). \
+            Keep these English terms as-is — do NOT translate them to Portuguese. \
+            Write the rest in correct Brazilian Portuguese.",
+        "es" => "\nThe user speaks Spanish but may use English technical/programming terms. \
+            Keep English technical terms as-is. Write the rest in correct Spanish.",
+        "fr" => "\nThe user speaks French but may use English technical/programming terms. \
+            Keep English technical terms as-is. Write the rest in correct French.",
+        "de" => "\nThe user speaks German but may use English technical/programming terms. \
+            Keep English technical terms as-is. Write the rest in correct German.",
+        "it" => "\nThe user speaks Italian but may use English technical/programming terms. \
+            Keep English technical terms as-is. Write the rest in correct Italian.",
+        "ja" | "ko" | "zh" => "\nThe user may mix English technical/programming terms with their native language. \
+            Keep English technical terms as-is. Write the rest in the user's language.",
+        _ => "\nKeep the original language. If the user mixes English technical terms, preserve them as-is.",
+    };
+
+    format!("{}{}", base, lang_hint)
 }

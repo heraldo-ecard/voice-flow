@@ -128,7 +128,7 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
     // 5. Refine with LLM
     emit_state(app, PipelineState::Refining);
     let t_llm = Instant::now();
-    let refined_text = groq::refine(&api_key, &raw_text, &llm_model).await?;
+    let refined_text = groq::refine(&api_key, &raw_text, &llm_model, &language).await?;
     let llm_latency = t_llm.elapsed().as_millis() as u64;
 
     // 6. Inject text into the currently focused input field
