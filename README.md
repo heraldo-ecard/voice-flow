@@ -1,8 +1,10 @@
 <p align="center">
+  <a href="https://github.com/heraldo-ecard/voice-flow/releases/latest"><img src="https://img.shields.io/github/v/release/heraldo-ecard/voice-flow?label=latest%20release&color=blue" alt="Latest Release" /></a>
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform" />
   <img src="https://img.shields.io/badge/built%20with-Tauri%20v2%20%2B%20Rust-orange.svg" alt="Built with" />
   <img src="https://img.shields.io/badge/powered%20by-Groq%20API-green.svg" alt="Powered by" />
+  <a href="https://github.com/heraldo-ecard/voice-flow/actions"><img src="https://img.shields.io/github/actions/workflow/status/heraldo-ecard/voice-flow/ci.yml?label=CI" alt="CI" /></a>
 </p>
 
 <h1 align="center">VoiceFlow</h1>
@@ -17,6 +19,8 @@
   <a href="#-how-it-works">How It Works</a> &nbsp;·&nbsp;
   <a href="#-features">Features</a> &nbsp;·&nbsp;
   <a href="#%EF%B8%8F-download--install">Download</a> &nbsp;·&nbsp;
+  <a href="https://github.com/heraldo-ecard/voice-flow/releases">Releases</a> &nbsp;·&nbsp;
+  <a href="CHANGELOG.md">Changelog</a> &nbsp;·&nbsp;
   <a href="#-contributing">Contributing</a>
 </p>
 
@@ -50,9 +54,11 @@ Groq offers a generous free tier. You won't pay anything for normal usage.
 
 | Platform | Download |
 |----------|----------|
-| **Windows** | [VoiceFlow-0.1.0-setup.exe](https://github.com/prsai/voice-flow/releases/latest) |
-| **macOS** | [VoiceFlow-0.1.0.dmg](https://github.com/prsai/voice-flow/releases/latest) |
-| **Linux** | [VoiceFlow-0.1.0.AppImage](https://github.com/prsai/voice-flow/releases/latest) |
+| **Windows** | [→ Download .exe installer](https://github.com/heraldo-ecard/voice-flow/releases/latest) |
+| **macOS** | [→ Download .dmg](https://github.com/heraldo-ecard/voice-flow/releases/latest) |
+| **Linux** | [→ Download .AppImage](https://github.com/heraldo-ecard/voice-flow/releases/latest) |
+
+> All installers are on the **[Releases page](https://github.com/heraldo-ecard/voice-flow/releases)**. The latest release is always at the top.
 
 > Or build from source — see [Build from Source](#-build-from-source) below.
 
@@ -142,14 +148,14 @@ That's it. No account, no subscription, no data collection.
 
 **Linux only:**
 ```bash
-sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev
+sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libasound2-dev libdbus-1-dev libxdo-dev
 ```
 
 ### Steps
 
 ```bash
 # Clone the repo
-git clone https://github.com/prsai/voice-flow.git
+git clone https://github.com/heraldo-ecard/voice-flow.git
 cd voice-flow
 
 # Install dependencies
