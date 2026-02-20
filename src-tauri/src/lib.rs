@@ -10,7 +10,7 @@ mod tray;
 use audio::capture::AudioState;
 use std::sync::Mutex;
 use storage::database::Database;
-use tauri::Manager;
+use tauri::{Manager, WindowEvent};
 
 pub struct AppState {
     pub audio: Mutex<AudioState>,
@@ -80,6 +80,14 @@ pub fn run() {
                 });
 
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
         })
         .invoke_handler(tauri::generate_handler![
             commands::pipeline::start_recording,
