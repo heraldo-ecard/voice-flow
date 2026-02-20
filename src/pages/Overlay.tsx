@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 
-const BAR_COUNT = 24;
+const BAR_COUNT = 20;
 
 export default function Overlay() {
   const [state, setState] = useState<string>("recording");
@@ -41,21 +41,21 @@ export default function Overlay() {
       style={{ background: "transparent" }}
       data-tauri-drag-region
     >
-      {/* Fixed-width pill so it never resizes between states */}
+      {/* Fixed-size pill: 200x40 matches the Tauri window exactly */}
       <div
-        className="bg-gray-900/90 backdrop-blur-md rounded-full py-2.5 flex items-center justify-center shadow-2xl border border-white/10"
-        style={{ width: 220 }}
+        className="bg-gray-900/90 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
+        style={{ width: 200, height: 40 }}
       >
         {isRecording && (
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-            <div className="flex items-center gap-[2px] h-7">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <div className="flex items-center gap-[2px] h-5">
               {levels.map((level, i) => (
                 <div
                   key={i}
-                  className="w-[2.5px] rounded-full bg-gradient-to-t from-blue-500 to-cyan-400 transition-all duration-75"
+                  className="w-[2px] rounded-full bg-gradient-to-t from-blue-500 to-cyan-400 transition-all duration-75"
                   style={{
-                    height: `${Math.max(3, Math.min(28, level * 280))}px`,
+                    height: `${Math.max(2, Math.min(20, level * 200))}px`,
                     opacity: 0.6 + Math.min(0.4, level * 4),
                   }}
                 />
@@ -64,7 +64,7 @@ export default function Overlay() {
           </div>
         )}
         {isProcessing && (
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <div className="flex gap-1">
               <div
                 className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"
@@ -79,7 +79,7 @@ export default function Overlay() {
                 style={{ animationDelay: "300ms" }}
               />
             </div>
-            <span className="text-white/70 text-[11px] font-medium tracking-wide">
+            <span className="text-white/70 text-[11px] font-medium">
               Processing...
             </span>
           </div>

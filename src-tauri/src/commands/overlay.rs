@@ -13,7 +13,7 @@ pub fn show_overlay(app: &AppHandle) {
 
     match WebviewWindowBuilder::new(app, "overlay", WebviewUrl::App("index.html".into()))
         .title("VoiceFlow")
-        .inner_size(280.0, 56.0)
+        .inner_size(200.0, 40.0)
         .position(x, y)
         .decorations(false)
         .transparent(true)
@@ -71,8 +71,8 @@ pub fn start_audio_level_emitter(app: AppHandle) {
 
 /// Calculate overlay position: bottom center of the primary monitor.
 fn get_overlay_position(app: &AppHandle) -> (f64, f64) {
-    let overlay_width = 280.0;
-    let overlay_height = 56.0;
+    let overlay_width = 200.0;
+    let overlay_height = 40.0;
     let bottom_margin = 48.0;
 
     // Try to get monitor info from the main window
