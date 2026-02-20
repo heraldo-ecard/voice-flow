@@ -16,8 +16,9 @@ export default function CostTracker({ stats }: Props) {
     <div
       className="rounded-xl p-4 transition-all duration-150"
       style={{
-        background: "linear-gradient(180deg, #0F2040 0%, #0A1628 100%)",
+        background: "var(--color-card-gradient)",
         border: "1px solid var(--color-border)",
+        boxShadow: `0 1px 3px var(--color-shadow-base)`,
       }}
     >
       <div className="flex items-center gap-2 mb-2">

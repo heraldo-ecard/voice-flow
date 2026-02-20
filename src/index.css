@@ -1,21 +1,27 @@
 @import "tailwindcss";
 
+/* ===== Brand Tokens: Light Mode (default) ===== */
 :root {
-  /* Colors */
-  --color-bg: #0A1628;
-  --color-surface: #0F2040;
-  --color-surface-raised: #152A52;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #F1F5F9;
   --color-brand: #1E6FFF;
   --color-brand-light: #0EA5E9;
   --color-brand-cyan: #06B6D4;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted: #64748B;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
-  --color-border: rgba(30, 111, 255, 0.15);
-  --color-border-hover: rgba(30, 111, 255, 0.40);
+  --color-border: rgba(30, 111, 255, 0.12);
+  --color-border-hover: rgba(30, 111, 255, 0.35);
+  --color-input-bg: rgba(0, 0, 0, 0.03);
+  --color-card-bg: #FFFFFF;
+  --color-card-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --color-raw-bg: #F1F5F9;
+  --color-shadow-base: rgba(0, 0, 0, 0.06);
+  --color-shadow-hover: rgba(30, 111, 255, 0.08);
 
   /* Typography */
   --font-display: 'Space Mono', monospace;
@@ -42,11 +48,30 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ===== Brand Tokens: Dark Mode ===== */
+[data-theme="dark"] {
+  --color-bg: #0A1628;
+  --color-surface: #0F2040;
+  --color-surface-raised: #152A52;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #64748B;
+  --color-border: rgba(30, 111, 255, 0.15);
+  --color-border-hover: rgba(30, 111, 255, 0.40);
+  --color-input-bg: rgba(255, 255, 255, 0.04);
+  --color-card-bg: #0F2040;
+  --color-card-gradient: linear-gradient(180deg, #0F2040 0%, #0A1628 100%);
+  --color-raw-bg: #020C1A;
+  --color-shadow-base: rgba(0, 0, 0, 0.4);
+  --color-shadow-hover: rgba(30, 111, 255, 0.12);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text-primary);
+  transition: background 250ms, color 250ms;
 }
 
 /* Brand animations */

@@ -10,9 +10,13 @@ import Onboarding from "./components/Onboarding";
 import { useTauriEvents } from "./hooks/useTauriEvents";
 import { useSettingsStore } from "./stores/settingsStore";
 
+function applyTheme(dark: boolean) {
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+}
+
 function AppContent() {
   useTauriEvents();
-  const { loadSettings, loading } = useSettingsStore();
+  const { loadSettings, loading, darkMode } = useSettingsStore();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -21,8 +25,13 @@ function AppContent() {
       if (!state.apiKey) {
         setShowOnboarding(true);
       }
+      applyTheme(state.darkMode);
     });
   }, [loadSettings]);
+
+  useEffect(() => {
+    applyTheme(darkMode);
+  }, [darkMode]);
 
   if (loading) {
     return (
@@ -40,9 +49,9 @@ function AppContent() {
           position="bottom-right"
           toastOptions={{
             style: {
-              background: "#0F2040",
-              color: "#FFFFFF",
-              border: "1px solid rgba(30, 111, 255, 0.30)",
+              background: "var(--color-surface)",
+              color: "var(--color-text-primary)",
+              border: "1px solid var(--color-border)",
               fontFamily: "var(--font-sans)",
               fontSize: "14px",
             },
@@ -62,13 +71,7 @@ function AppContent() {
         >
           <NavLink
             to="/"
-            className={({ isActive }) =>
-              `p-2.5 rounded-lg transition-all duration-150 ${
-                isActive
-                  ? "text-white"
-                  : "hover:text-white"
-              }`
-            }
+            className="p-2.5 rounded-lg transition-all duration-150"
             style={({ isActive }) => ({
               color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
               background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
@@ -79,13 +82,7 @@ function AppContent() {
           </NavLink>
           <NavLink
             to="/settings"
-            className={({ isActive }) =>
-              `p-2.5 rounded-lg transition-all duration-150 ${
-                isActive
-                  ? "text-white"
-                  : "hover:text-white"
-              }`
-            }
+            className="p-2.5 rounded-lg transition-all duration-150"
             style={({ isActive }) => ({
               color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
               background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
@@ -108,9 +105,9 @@ function AppContent() {
         position="bottom-right"
         toastOptions={{
           style: {
-            background: "#0F2040",
-            color: "#FFFFFF",
-            border: "1px solid rgba(30, 111, 255, 0.30)",
+            background: "var(--color-surface)",
+            color: "var(--color-text-primary)",
+            border: "1px solid var(--color-border)",
             fontFamily: "var(--font-sans)",
             fontSize: "14px",
           },

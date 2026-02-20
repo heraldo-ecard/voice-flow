@@ -31,14 +31,14 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
     <div
       className="rounded-xl p-4 transition-all duration-150 animate-fade-up"
       style={{
-        background: "rgba(255, 255, 255, 0.03)",
-        border: "1px solid rgba(30, 111, 255, 0.10)",
+        background: "var(--color-input-bg)",
+        border: "1px solid var(--color-border)",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.35)";
+        e.currentTarget.style.borderColor = "var(--color-border-hover)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.10)";
+        e.currentTarget.style.borderColor = "var(--color-border)";
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -107,7 +107,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
         <div
           className="mt-2 p-3 rounded-lg text-xs"
           style={{
-            background: "#020C1A",
+            background: "var(--color-raw-bg)",
             border: "1px solid var(--color-border)",
             color: "var(--color-text-muted)",
             fontFamily: "var(--font-mono)",

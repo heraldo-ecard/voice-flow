@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSettingsStore } from "../stores/settingsStore";
-import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Power } from "lucide-react";
+import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Moon, Power } from "lucide-react";
 
 const inputStyle: React.CSSProperties = {
-  background: "rgba(255, 255, 255, 0.04)",
+  background: "var(--color-input-bg)",
   border: "1px solid var(--color-border)",
   borderRadius: "var(--radius-md)",
   color: "var(--color-text-primary)",
@@ -16,11 +16,12 @@ const inputStyle: React.CSSProperties = {
 };
 
 const cardStyle: React.CSSProperties = {
-  background: "linear-gradient(180deg, #0F2040 0%, #0A1628 100%)",
+  background: "var(--color-card-gradient)",
   border: "1px solid var(--color-border)",
   borderRadius: "var(--radius-lg)",
   padding: "20px",
   transition: "border-color 200ms",
+  boxShadow: "0 1px 3px var(--color-shadow-base)",
 };
 
 export default function Settings() {
@@ -30,10 +31,12 @@ export default function Settings() {
     llmModel,
     language,
     hotkey,
+    darkMode,
     autostart,
     loading,
     setApiKey,
     setSetting,
+    toggleDarkMode,
   } = useSettingsStore();
 
   const [localApiKey, setLocalApiKey] = useState("");
@@ -61,7 +64,7 @@ export default function Settings() {
   };
 
   const blurHandler = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.15)";
+    e.currentTarget.style.borderColor = "var(--color-border)";
     e.currentTarget.style.boxShadow = "none";
   };
 
@@ -76,7 +79,7 @@ export default function Settings() {
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Key className="w-4 h-4" style={{ color: "var(--color-warning)" }} />
-          <h2 className="font-semibold text-sm" style={{ color: "var(--color-text-primary)" }}>Groq API Key</h2>
+          <h2 className="font-semibold text-sm">Groq API Key</h2>
         </div>
         <div className="flex gap-2">
           <input
@@ -195,7 +198,28 @@ export default function Settings() {
       </section>
 
       {/* Toggles */}
-      <section style={cardStyle}>
+      <section style={cardStyle} className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Moon className="w-4 h-4" style={{ color: "var(--color-brand-cyan)" }} />
+            <span className="font-semibold text-sm">Dark Mode</span>
+          </div>
+          <button
+            onClick={toggleDarkMode}
+            className="relative w-11 h-6 rounded-full transition-colors duration-150"
+            style={{
+              background: darkMode
+                ? "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)"
+                : "rgba(100, 116, 139, 0.3)",
+            }}
+          >
+            <span
+              className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150"
+              style={{ transform: darkMode ? "translateX(20px)" : "none" }}
+            />
+          </button>
+        </div>
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Power className="w-4 h-4" style={{ color: "var(--color-success)" }} />

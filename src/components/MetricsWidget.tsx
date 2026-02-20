@@ -40,16 +40,17 @@ export default function MetricsWidget({ stats }: Props) {
           key={m.label}
           className="rounded-xl p-4 transition-all duration-150"
           style={{
-            background: "linear-gradient(180deg, #0F2040 0%, #0A1628 100%)",
+            background: "var(--color-card-gradient)",
             border: "1px solid var(--color-border)",
+            boxShadow: `0 1px 3px var(--color-shadow-base)`,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.35)";
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.5), 0 0 24px rgba(30, 111, 255, 0.12)";
+            e.currentTarget.style.borderColor = "var(--color-border-hover)";
+            e.currentTarget.style.boxShadow = `0 4px 16px var(--color-shadow-base), 0 0 24px var(--color-shadow-hover)`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.15)";
-            e.currentTarget.style.boxShadow = "none";
+            e.currentTarget.style.borderColor = "var(--color-border)";
+            e.currentTarget.style.boxShadow = `0 1px 3px var(--color-shadow-base)`;
           }}
         >
           <div className="flex items-center gap-2 mb-1">
