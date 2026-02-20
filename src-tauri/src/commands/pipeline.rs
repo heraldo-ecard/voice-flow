@@ -51,11 +51,8 @@ pub async fn start_recording(app: AppHandle) -> std::result::Result<(), String> 
 #[tauri::command]
 pub async fn stop_and_process(app: AppHandle) -> std::result::Result<PipelineResult, String> {
     let result = run_pipeline(&app).await;
-    match &result {
-        Ok(r) => {
-            let _ = app.emit("pipeline-complete", r);
-        }
-        Err(_) => {}
+    if let Ok(r) = &result {
+        let _ = app.emit("pipeline-complete", r);
     }
     // Hide overlay before going idle so the pill never shows empty
     super::overlay::hide_overlay(&app);
