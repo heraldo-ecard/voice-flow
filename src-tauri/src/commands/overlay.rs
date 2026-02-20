@@ -69,21 +69,32 @@ pub fn start_audio_level_emitter(app: AppHandle) {
     });
 }
 
-/// Calculate overlay position: bottom center of the primary monitor.
+/// Calculate overlay position: bottom center of the current monitor.
 fn get_overlay_position(app: &AppHandle) -> (f64, f64) {
     let overlay_width = 138.0;
     let overlay_height = 32.0;
     let bottom_margin = 48.0;
 
-    // Try to get monitor info from the main window
-    if let Some(window) = app.get_webview_window("main") {
-        if let Ok(Some(monitor)) = window.current_monitor() {
-            let size = monitor.size();
-            let scale = monitor.scale_factor();
-            let x = (size.width as f64 / scale - overlay_width) / 2.0;
-            let y = size.height as f64 / scale - overlay_height - bottom_margin;
-            return (x, y);
-        }
+    // Try current monitor of main window, fall back to primary monitor
+    let monitor = app
+        .get_webview_window("main")
+        .and_then(|w| w.current_monitor().ok().flatten())
+        .or_else(|| app.primary_monitor().ok().flatten());
+
+    if let Some(monitor) = monitor {
+        let size = monitor.size();
+        let pos = monitor.position();
+        let scale = monitor.scale_factor();
+
+        // Convert physical pixels → logical pixels, including monitor offset
+        let monitor_x = pos.x as f64 / scale;
+        let monitor_y = pos.y as f64 / scale;
+        let monitor_w = size.width as f64 / scale;
+        let monitor_h = size.height as f64 / scale;
+
+        let x = monitor_x + (monitor_w - overlay_width) / 2.0;
+        let y = monitor_y + monitor_h - overlay_height - bottom_margin;
+        return (x, y);
     }
 
     // Fallback: reasonable default
