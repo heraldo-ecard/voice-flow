@@ -41,10 +41,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         "raw_mode",
       ];
 
-      const results: Record<string, string | null> = {};
-      for (const key of keys) {
-        results[key] = await invoke<string | null>("get_setting", { key });
-      }
+      const values = await Promise.all(
+        keys.map((key) => invoke<string | null>("get_setting", { key })),
+      );
+      const results: Record<string, string | null> = Object.fromEntries(
+        keys.map((key, i) => [key, values[i]]),
+      );
 
       // Try loading API key from keychain
       let apiKey = "";

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -8,7 +8,6 @@ export default function Overlay() {
   const [state, setState] = useState<string>("recording");
   const [levels, setLevels] = useState<number[]>(new Array(BAR_COUNT).fill(0));
   const [isDark, setIsDark] = useState(true);
-  const levelsRef = useRef(levels);
 
   useEffect(() => {
     // Load theme from settings
@@ -28,9 +27,7 @@ export default function Overlay() {
       unlisteners.push(
         await listen<number>("audio-level", (event) => {
           const level = event.payload;
-          const next = [...levelsRef.current.slice(1), level];
-          levelsRef.current = next;
-          setLevels(next);
+          setLevels((prev) => [...prev.slice(1), level]);
         }),
       );
     }
@@ -42,10 +39,12 @@ export default function Overlay() {
   const isRecording = state === "recording";
   const isProcessing = ["encoding", "transcribing", "refining", "injecting"].includes(state);
 
-  const pillBg = isDark ? "rgba(10, 22, 40, 0.92)" : "rgba(255, 255, 255, 0.92)";
-  const pillBorder = isDark ? "rgba(30, 111, 255, 0.20)" : "rgba(30, 111, 255, 0.15)";
-  const pillShadow = isDark ? "none" : "0 2px 12px rgba(0, 0, 0, 0.12)";
-  const processingTextColor = isDark ? "rgba(203, 213, 225, 0.7)" : "rgba(71, 85, 105, 0.8)";
+  const { pillBg, pillBorder, pillShadow, processingTextColor } = useMemo(() => ({
+    pillBg: isDark ? "rgba(10, 22, 40, 0.92)" : "rgba(255, 255, 255, 0.92)",
+    pillBorder: isDark ? "rgba(30, 111, 255, 0.20)" : "rgba(30, 111, 255, 0.15)",
+    pillShadow: isDark ? "none" : "0 2px 12px rgba(0, 0, 0, 0.12)",
+    processingTextColor: isDark ? "rgba(203, 213, 225, 0.7)" : "rgba(71, 85, 105, 0.8)",
+  }), [isDark]);
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSettingsStore } from "../stores/settingsStore";
 import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Moon, Power, Zap } from "lucide-react";
 
@@ -40,12 +40,8 @@ export default function Settings() {
     toggleDarkMode,
   } = useSettingsStore();
 
-  const [localApiKey, setLocalApiKey] = useState("");
+  const [localApiKey, setLocalApiKey] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
-
-  useEffect(() => {
-    setLocalApiKey(apiKey);
-  }, [apiKey]);
 
   if (loading) {
     return (
@@ -57,16 +53,6 @@ export default function Settings() {
 
   const handleSaveApiKey = async () => {
     await setApiKey(localApiKey);
-  };
-
-  const focusHandler = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "var(--color-brand)";
-    e.currentTarget.style.boxShadow = "inset 0 0 0 1px var(--color-brand), 0 0 12px rgba(30, 111, 255, 0.2)";
-  };
-
-  const blurHandler = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "var(--color-border)";
-    e.currentTarget.style.boxShadow = "none";
   };
 
   return (
@@ -88,9 +74,8 @@ export default function Settings() {
             value={localApiKey}
             onChange={(e) => setLocalApiKey(e.target.value)}
             placeholder="gsk_..."
+            className="input-branded"
             style={{ ...inputStyle, flex: 1 }}
-            onFocus={focusHandler}
-            onBlur={blurHandler}
           />
           <button
             onClick={() => setShowKey(!showKey)}
@@ -126,9 +111,8 @@ export default function Settings() {
         <select
           value={sttModel}
           onChange={(e) => setSetting("stt_model", e.target.value)}
+          className="input-branded"
           style={inputStyle}
-          onFocus={focusHandler}
-          onBlur={blurHandler}
         >
           <option value="whisper-large-v3">Whisper Large v3</option>
           <option value="whisper-large-v3-turbo">Whisper Large v3 Turbo</option>
@@ -145,9 +129,8 @@ export default function Settings() {
         <select
           value={llmModel}
           onChange={(e) => setSetting("llm_model", e.target.value)}
+          className="input-branded"
           style={inputStyle}
-          onFocus={focusHandler}
-          onBlur={blurHandler}
         >
           <optgroup label="Production — Meta">
             <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
@@ -177,9 +160,8 @@ export default function Settings() {
         <select
           value={language}
           onChange={(e) => setSetting("language", e.target.value)}
+          className="input-branded"
           style={inputStyle}
-          onFocus={focusHandler}
-          onBlur={blurHandler}
         >
           <option value="pt">Portuguese</option>
           <option value="en">English</option>

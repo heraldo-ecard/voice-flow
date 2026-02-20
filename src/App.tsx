@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { HashRouter, Routes, Route, NavLink } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import { Toaster, type ToasterProps } from "react-hot-toast";
 import { LayoutDashboard, Settings as SettingsIcon } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import Dashboard from "./pages/Dashboard";
@@ -14,10 +14,24 @@ function applyTheme(dark: boolean) {
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
 }
 
+const TOAST_OPTIONS: ToasterProps["toastOptions"] = {
+  style: {
+    background: "var(--color-surface)",
+    color: "var(--color-text-primary)",
+    border: "1px solid var(--color-border)",
+    fontFamily: "var(--font-sans)",
+    fontSize: "14px",
+  },
+};
+
 function AppContent() {
   useTauriEvents();
   const { loadSettings, loading, darkMode } = useSettingsStore();
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.add("main-window");
+  }, []);
 
   useEffect(() => {
     loadSettings().then(() => {
@@ -41,79 +55,56 @@ function AppContent() {
     );
   }
 
-  if (showOnboarding) {
-    return (
-      <div className="min-h-screen" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
-        <Onboarding onComplete={() => setShowOnboarding(false)} />
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: "var(--color-surface)",
-              color: "var(--color-text-primary)",
-              border: "1px solid var(--color-border)",
-              fontFamily: "var(--font-sans)",
-              fontSize: "14px",
-            },
-          }}
-        />
-      </div>
-    );
-  }
-
   return (
-    <HashRouter>
-      <div className="min-h-screen flex" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
-        {/* Sidebar */}
-        <nav
-          className="w-14 flex flex-col items-center py-4 gap-2"
-          style={{ background: "var(--color-surface)", borderRight: "1px solid var(--color-border)" }}
-        >
-          <NavLink
-            to="/"
-            className="p-2.5 rounded-lg transition-all duration-150"
-            style={({ isActive }) => ({
-              color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
-              background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
-            })}
-            title="Dashboard"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-          </NavLink>
-          <NavLink
-            to="/settings"
-            className="p-2.5 rounded-lg transition-all duration-150"
-            style={({ isActive }) => ({
-              color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
-              background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
-            })}
-            title="Settings"
-          >
-            <SettingsIcon className="w-5 h-5" />
-          </NavLink>
-        </nav>
+    <>
+      {showOnboarding ? (
+        <div className="min-h-screen" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
+          <Onboarding onComplete={() => setShowOnboarding(false)} />
+        </div>
+      ) : (
+        <HashRouter>
+          <div className="min-h-screen flex" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
+            {/* Sidebar */}
+            <nav
+              className="w-14 flex flex-col items-center py-4 gap-2"
+              style={{ background: "var(--color-surface)", borderRight: "1px solid var(--color-border)" }}
+            >
+              <NavLink
+                to="/"
+                className="p-2.5 rounded-lg transition-all duration-150"
+                style={({ isActive }) => ({
+                  color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
+                  background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
+                })}
+                title="Dashboard"
+              >
+                <LayoutDashboard className="w-5 h-5" />
+              </NavLink>
+              <NavLink
+                to="/settings"
+                className="p-2.5 rounded-lg transition-all duration-150"
+                style={({ isActive }) => ({
+                  color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
+                  background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
+                })}
+                title="Settings"
+              >
+                <SettingsIcon className="w-5 h-5" />
+              </NavLink>
+            </nav>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </main>
-      </div>
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: "var(--color-surface)",
-            color: "var(--color-text-primary)",
-            border: "1px solid var(--color-border)",
-            fontFamily: "var(--font-sans)",
-            fontSize: "14px",
-          },
-        }}
-      />
-    </HashRouter>
+            {/* Main content */}
+            <main className="flex-1 overflow-y-auto">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </main>
+          </div>
+        </HashRouter>
+      )}
+      <Toaster position="bottom-right" toastOptions={TOAST_OPTIONS} />
+    </>
   );
 }
 
@@ -123,7 +114,5 @@ export default function App() {
     return <Overlay />;
   }
 
-  // Main window: apply themed background to body
-  document.body.classList.add("main-window");
   return <AppContent />;
 }

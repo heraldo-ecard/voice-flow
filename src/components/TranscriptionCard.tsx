@@ -8,6 +8,10 @@ interface Props {
   onDelete: () => void;
 }
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr + "Z").toLocaleString();
+}
+
 export default function TranscriptionCard({ transcription, onDelete }: Props) {
   const [showRaw, setShowRaw] = useState(false);
 
@@ -20,25 +24,12 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
     }
   };
 
-  const totalLatency = transcription.stt_latency_ms + transcription.llm_latency_ms;
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr + "Z");
-    return date.toLocaleString();
-  };
-
   return (
     <div
-      className="rounded-xl p-4 transition-all duration-150 animate-fade-up"
+      className="rounded-xl p-4 transition-all duration-150 animate-fade-up hover-card"
       style={{
         background: "var(--color-surface-raised)",
         border: "1px solid var(--color-border)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = "var(--color-border-hover)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "var(--color-border)";
       }}
     >
       <div className="flex items-start justify-between gap-3">
@@ -48,20 +39,16 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={copyText}
-            className="p-1.5 rounded transition-colors duration-150"
+            className="p-1.5 rounded transition-colors duration-150 hover-brand-light"
             style={{ color: "var(--color-text-muted)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-brand-light)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
             title="Copy"
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 rounded transition-colors duration-150"
+            className="p-1.5 rounded transition-colors duration-150 hover-error"
             style={{ color: "var(--color-text-muted)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-error)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
             title="Delete"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -84,15 +71,13 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
               fontSize: "11px",
             }}
           >
-            {totalLatency}ms
+            {transcription.stt_latency_ms + transcription.llm_latency_ms}ms
           </span>
         </span>
         <button
           onClick={() => setShowRaw(!showRaw)}
-          className="flex items-center gap-0.5 ml-auto transition-colors duration-150"
+          className="flex items-center gap-0.5 ml-auto transition-colors duration-150 hover-text-secondary"
           style={{ color: "var(--color-text-muted)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
         >
           Raw
           {showRaw ? (

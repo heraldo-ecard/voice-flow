@@ -53,18 +53,16 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    loadTranscriptions(true);
-    loadStats();
+    Promise.all([loadTranscriptions(true), loadStats()]);
   }, [loadTranscriptions, loadStats]);
 
   useEffect(() => {
     if (lastResult) {
-      loadTranscriptions(true);
-      loadStats();
+      Promise.all([loadTranscriptions(true), loadStats()]);
     }
   }, [lastResult, loadTranscriptions, loadStats]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       await invoke("delete_transcription", { id });
       setTranscriptions((prev) => prev.filter((t) => t.id !== id));
@@ -72,7 +70,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to delete:", err);
     }
-  };
+  }, [loadStats]);
 
   const handleSearch = () => {
     loadTranscriptions(true);
@@ -100,7 +98,7 @@ export default function Dashboard() {
         <button
           onClick={handleRecord}
           disabled={pipelineState !== "idle" && pipelineState !== "recording"}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150"
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150${pipelineState === "idle" ? " hover-lift" : ""}`}
           style={
             pipelineState === "recording"
               ? { background: "var(--color-error)" }
@@ -108,16 +106,6 @@ export default function Dashboard() {
                 ? { background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)" }
                 : { background: "var(--color-text-muted)", cursor: "not-allowed" }
           }
-          onMouseEnter={(e) => {
-            if (pipelineState === "idle") {
-              e.currentTarget.style.boxShadow = "0 0 20px rgba(30, 111, 255, 0.5)";
-              e.currentTarget.style.transform = "translateY(-1px)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "none";
-            e.currentTarget.style.transform = "none";
-          }}
         >
           <Mic className="w-4 h-4" />
           {pipelineState === "recording"
@@ -147,40 +135,22 @@ export default function Dashboard() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="Search transcriptions..."
-            className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-150"
+            className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-150 input-branded"
             style={{
               background: "var(--color-input-bg)",
               border: "1px solid var(--color-border)",
               color: "var(--color-text-primary)",
               fontFamily: "var(--font-sans)",
             }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "var(--color-brand)";
-              e.currentTarget.style.boxShadow = "inset 0 0 0 1px var(--color-brand), 0 0 12px rgba(30, 111, 255, 0.2)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.15)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
           />
         </div>
         <button
           onClick={handleSearch}
-          className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
+          className="px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 hover-ghost-brand"
           style={{
             background: "transparent",
             border: "1px solid rgba(30, 111, 255, 0.25)",
             color: "var(--color-text-secondary)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.6)";
-            e.currentTarget.style.color = "#FFFFFF";
-            e.currentTarget.style.background = "rgba(30, 111, 255, 0.08)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.25)";
-            e.currentTarget.style.color = "var(--color-text-secondary)";
-            e.currentTarget.style.background = "transparent";
           }}
         >
           Search
@@ -223,10 +193,8 @@ export default function Dashboard() {
       {hasMore && transcriptions.length > 0 && (
         <button
           onClick={() => loadTranscriptions(false)}
-          className="w-full py-2 text-sm font-medium transition-colors duration-150"
+          className="w-full py-2 text-sm font-medium transition-colors duration-150 hover-brand-light"
           style={{ color: "var(--color-brand)" }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-brand-light)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-brand)")}
         >
           Load more...
         </button>
