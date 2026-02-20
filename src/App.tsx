@@ -92,6 +92,9 @@ export default function App() {
   // If this is the overlay window, render only the overlay component
   const windowLabel = getCurrentWindow().label;
   if (windowLabel === "overlay") {
+    // Make html/body fully transparent for the overlay window
+    document.documentElement.style.background = "transparent";
+    document.body.style.background = "transparent";
     return <Overlay />;
   }
 

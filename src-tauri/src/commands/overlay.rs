@@ -17,6 +17,7 @@ pub fn show_overlay(app: &AppHandle) {
         .position(x, y)
         .decorations(false)
         .transparent(true)
+        .shadow(false)
         .always_on_top(true)
         .resizable(false)
         .skip_taskbar(true)
