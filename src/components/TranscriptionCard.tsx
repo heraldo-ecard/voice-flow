@@ -28,39 +28,71 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div
+      className="rounded-xl p-4 transition-all duration-150 animate-fade-up"
+      style={{
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(30, 111, 255, 0.10)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.35)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "rgba(30, 111, 255, 0.10)";
+      }}
+    >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm flex-1 leading-relaxed">
+        <p className="text-sm flex-1 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
           {transcription.refined_text}
         </p>
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={copyText}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            className="p-1.5 rounded transition-colors duration-150"
+            style={{ color: "var(--color-text-muted)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-brand-light)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
             title="Copy"
           >
-            <Copy className="w-3.5 h-3.5 text-gray-500" />
+            <Copy className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            className="p-1.5 rounded transition-colors duration-150"
+            style={{ color: "var(--color-text-muted)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-error)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
             title="Delete"
           >
-            <Trash2 className="w-3.5 h-3.5 text-gray-500" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+      <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <span>{formatDate(transcription.created_at)}</span>
         <span>{transcription.word_count} words</span>
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          {totalLatency}ms
+          <span
+            className="px-1.5 py-0.5 rounded text-xs"
+            style={{
+              background: "rgba(30, 111, 255, 0.12)",
+              color: "var(--color-brand-light)",
+              border: "1px solid rgba(14, 165, 233, 0.25)",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+            }}
+          >
+            {totalLatency}ms
+          </span>
         </span>
         <button
           onClick={() => setShowRaw(!showRaw)}
-          className="flex items-center gap-0.5 hover:text-gray-700 dark:hover:text-gray-300 ml-auto"
+          className="flex items-center gap-0.5 ml-auto transition-colors duration-150"
+          style={{ color: "var(--color-text-muted)" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-secondary)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
         >
           Raw
           {showRaw ? (
@@ -72,7 +104,16 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
       </div>
 
       {showRaw && (
-        <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-900 rounded text-xs text-gray-600 dark:text-gray-400">
+        <div
+          className="mt-2 p-3 rounded-lg text-xs"
+          style={{
+            background: "#020C1A",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text-muted)",
+            fontFamily: "var(--font-mono)",
+            lineHeight: 1.7,
+          }}
+        >
           {transcription.raw_text}
         </div>
       )}

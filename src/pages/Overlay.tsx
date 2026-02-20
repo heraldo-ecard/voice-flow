@@ -42,19 +42,29 @@ export default function Overlay() {
       data-tauri-drag-region
     >
       <div
-        className="bg-gray-900/90 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
-        style={{ width: 138, height: 32 }}
+        className="rounded-full flex items-center justify-center"
+        style={{
+          width: 138,
+          height: 32,
+          background: "rgba(10, 22, 40, 0.92)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(30, 111, 255, 0.20)",
+        }}
       >
         {isRecording && (
           <div className="flex items-center gap-1.5">
-            <div className="w-[6px] h-[6px] rounded-full bg-red-500 animate-pulse flex-shrink-0" />
+            <div
+              className="w-[6px] h-[6px] rounded-full flex-shrink-0 animate-record-pulse"
+              style={{ background: "#EF4444" }}
+            />
             <div className="flex items-center gap-[1.5px] h-4">
               {levels.map((level, i) => (
                 <div
                   key={i}
-                  className="w-[1.5px] rounded-full bg-gradient-to-t from-blue-500 to-cyan-400 transition-all duration-75"
+                  className="w-[1.5px] rounded-full transition-all duration-75"
                   style={{
                     height: `${Math.max(2, Math.min(16, level * 160))}px`,
+                    background: `linear-gradient(to top, #1E6FFF, #06B6D4)`,
                     opacity: 0.6 + Math.min(0.4, level * 4),
                   }}
                 />
@@ -66,19 +76,22 @@ export default function Overlay() {
           <div className="flex items-center gap-1.5">
             <div className="flex gap-[3px]">
               <div
-                className="w-[5px] h-[5px] rounded-full bg-blue-400 animate-bounce"
-                style={{ animationDelay: "0ms" }}
+                className="w-[5px] h-[5px] rounded-full animate-bounce"
+                style={{ background: "#1E6FFF", animationDelay: "0ms" }}
               />
               <div
-                className="w-[5px] h-[5px] rounded-full bg-blue-400 animate-bounce"
-                style={{ animationDelay: "150ms" }}
+                className="w-[5px] h-[5px] rounded-full animate-bounce"
+                style={{ background: "#0EA5E9", animationDelay: "150ms" }}
               />
               <div
-                className="w-[5px] h-[5px] rounded-full bg-blue-400 animate-bounce"
-                style={{ animationDelay: "300ms" }}
+                className="w-[5px] h-[5px] rounded-full animate-bounce"
+                style={{ background: "#06B6D4", animationDelay: "300ms" }}
               />
             </div>
-            <span className="text-white/70 text-[10px] font-medium leading-none">
+            <span
+              className="text-[10px] font-medium leading-none"
+              style={{ color: "rgba(203, 213, 225, 0.7)", fontFamily: "'DM Sans', sans-serif" }}
+            >
               Processing
             </span>
           </div>

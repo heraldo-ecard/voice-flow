@@ -21,41 +21,58 @@ function AppContent() {
       if (!state.apiKey) {
         setShowOnboarding(true);
       }
-      document.documentElement.classList.toggle("dark", state.darkMode);
     });
   }, [loadSettings]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--color-bg)" }}>
+        <div className="w-8 h-8 rounded-full border-2 border-transparent animate-spin" style={{ borderTopColor: "var(--color-brand)" }} />
       </div>
     );
   }
 
   if (showOnboarding) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <div className="min-h-screen" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
         <Onboarding onComplete={() => setShowOnboarding(false)} />
-        <Toaster position="bottom-right" />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#0F2040",
+              color: "#FFFFFF",
+              border: "1px solid rgba(30, 111, 255, 0.30)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "14px",
+            },
+          }}
+        />
       </div>
     );
   }
 
   return (
     <HashRouter>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex">
+      <div className="min-h-screen flex" style={{ background: "var(--color-bg)", color: "var(--color-text-primary)" }}>
         {/* Sidebar */}
-        <nav className="w-14 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col items-center py-4 gap-2">
+        <nav
+          className="w-14 flex flex-col items-center py-4 gap-2"
+          style={{ background: "var(--color-surface)", borderRight: "1px solid var(--color-border)" }}
+        >
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `p-2.5 rounded-lg transition-colors ${
+              `p-2.5 rounded-lg transition-all duration-150 ${
                 isActive
-                  ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-                  : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "text-white"
+                  : "hover:text-white"
               }`
             }
+            style={({ isActive }) => ({
+              color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
+              background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
+            })}
             title="Dashboard"
           >
             <LayoutDashboard className="w-5 h-5" />
@@ -63,12 +80,16 @@ function AppContent() {
           <NavLink
             to="/settings"
             className={({ isActive }) =>
-              `p-2.5 rounded-lg transition-colors ${
+              `p-2.5 rounded-lg transition-all duration-150 ${
                 isActive
-                  ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-                  : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "text-white"
+                  : "hover:text-white"
               }`
             }
+            style={({ isActive }) => ({
+              color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
+              background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
+            })}
             title="Settings"
           >
             <SettingsIcon className="w-5 h-5" />
@@ -83,16 +104,25 @@ function AppContent() {
           </Routes>
         </main>
       </div>
-      <Toaster position="bottom-right" />
+      <Toaster
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: "#0F2040",
+            color: "#FFFFFF",
+            border: "1px solid rgba(30, 111, 255, 0.30)",
+            fontFamily: "var(--font-sans)",
+            fontSize: "14px",
+          },
+        }}
+      />
     </HashRouter>
   );
 }
 
 export default function App() {
-  // If this is the overlay window, render only the overlay component
   const windowLabel = getCurrentWindow().label;
   if (windowLabel === "overlay") {
-    // Make html/body fully transparent for the overlay window
     document.documentElement.style.background = "transparent";
     document.body.style.background = "transparent";
     return <Overlay />;

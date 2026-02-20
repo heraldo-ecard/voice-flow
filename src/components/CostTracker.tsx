@@ -5,29 +5,49 @@ interface Props {
   stats: TranscriptionStats;
 }
 
-// Rough cost estimates based on Groq pricing
-// Whisper: ~$0.111 per hour of audio (~$0.000031 per second)
-// LLM: ~$0.59 per 1M tokens for Llama 3.3 70B
-const COST_PER_TRANSCRIPTION_ESTIMATE = 0.001; // ~$0.001 per avg transcription
-const COST_PER_REFINEMENT_ESTIMATE = 0.0003; // ~$0.0003 per avg refinement
+const COST_PER_TRANSCRIPTION_ESTIMATE = 0.001;
+const COST_PER_REFINEMENT_ESTIMATE = 0.0003;
 
 export default function CostTracker({ stats }: Props) {
   const costPerItem = COST_PER_TRANSCRIPTION_ESTIMATE + COST_PER_REFINEMENT_ESTIMATE;
   const totalCost = stats.total_transcriptions * costPerItem;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+    <div
+      className="rounded-xl p-4 transition-all duration-150"
+      style={{
+        background: "linear-gradient(180deg, #0F2040 0%, #0A1628 100%)",
+        border: "1px solid var(--color-border)",
+      }}
+    >
       <div className="flex items-center gap-2 mb-2">
-        <DollarSign className="w-4 h-4 text-green-500" />
+        <DollarSign className="w-4 h-4" style={{ color: "var(--color-success)" }} />
         <h3 className="font-semibold text-sm">Estimated Cost</h3>
       </div>
-      <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold">${totalCost.toFixed(3)}</span>
-        <span className="text-xs text-gray-500">
-          total ({stats.total_transcriptions} transcriptions)
+      <div className="flex items-baseline gap-2">
+        <span
+          className="text-2xl font-bold"
+          style={{
+            fontFamily: "var(--font-display)",
+            background: "linear-gradient(90deg, #10B981 0%, #06B6D4 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          ${totalCost.toFixed(3)}
+        </span>
+        <span
+          className="text-xs px-2 py-0.5 rounded-full"
+          style={{
+            background: "rgba(16, 185, 129, 0.12)",
+            color: "var(--color-success)",
+            border: "1px solid rgba(16, 185, 129, 0.25)",
+          }}
+        >
+          {stats.total_transcriptions} transcriptions
         </span>
       </div>
-      <p className="text-xs text-gray-400 mt-1">
+      <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
         Based on Groq pricing estimates. Actual costs may vary.
       </p>
     </div>
