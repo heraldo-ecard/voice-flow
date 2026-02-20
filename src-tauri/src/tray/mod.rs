@@ -7,12 +7,28 @@ use tauri::{
 
 use crate::errors::{Result, VoiceFlowError};
 
-#[allow(dead_code)]
+// Tray icon PNG bytes — embedded at compile time
+const TRAY_IDLE: &[u8] = include_bytes!("../../icons/tray-idle.png");
+const TRAY_RECORDING: &[u8] = include_bytes!("../../icons/tray-recording.png");
+const TRAY_PROCESSING: &[u8] = include_bytes!("../../icons/tray-processing.png");
+
+/// ID used to retrieve the tray icon handle from anywhere in the app.
+pub const TRAY_ID: &str = "voiceflow-tray";
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TrayState {
     Idle,
     Recording,
     Processing,
+}
+
+/// Decode PNG bytes to a Tauri `Image` (raw RGBA).
+fn png_to_image(bytes: &[u8]) -> Option<Image<'static>> {
+    use image::GenericImageView;
+    let img = image::load_from_memory(bytes).ok()?;
+    let rgba = img.to_rgba8();
+    let (width, height) = img.dimensions();
+    Some(Image::new_owned(rgba.into_raw(), width, height))
 }
 
 pub fn create_tray(app: &AppHandle) -> Result<TrayIcon> {
@@ -24,12 +40,14 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon> {
     let menu = Menu::with_items(app, &[&show, &quit])
         .map_err(|e| VoiceFlowError::Pipeline(e.to_string()))?;
 
-    let icon = app
-        .default_window_icon()
-        .cloned()
-        .unwrap_or_else(|| Image::new_owned(vec![0u8; 4], 1, 1));
+    let icon = png_to_image(TRAY_IDLE)
+        .unwrap_or_else(|| {
+            app.default_window_icon()
+                .cloned()
+                .unwrap_or_else(|| Image::new_owned(vec![0u8; 4], 1, 1))
+        });
 
-    let tray = TrayIconBuilder::new()
+    let tray = TrayIconBuilder::with_id(TRAY_ID)
         .menu(&menu)
         .tooltip("VoiceFlow - Idle")
         .icon(icon)
@@ -51,16 +69,21 @@ pub fn create_tray(app: &AppHandle) -> Result<TrayIcon> {
     Ok(tray)
 }
 
-#[allow(dead_code)]
-pub fn update_tray_state(tray: &TrayIcon, _app: &AppHandle, state: TrayState) -> Result<()> {
-    let tooltip = match state {
-        TrayState::Idle => "VoiceFlow - Idle",
-        TrayState::Recording => "VoiceFlow - Recording...",
-        TrayState::Processing => "VoiceFlow - Processing...",
+/// Update the tray icon and tooltip to reflect the current pipeline state.
+/// Retrieves the tray handle by ID — no-op if the tray is unavailable.
+pub fn update_tray_state(app: &AppHandle, state: TrayState) {
+    let Some(tray) = app.tray_by_id(TRAY_ID) else {
+        return;
     };
 
-    tray.set_tooltip(Some(tooltip))
-        .map_err(|e| VoiceFlowError::Pipeline(e.to_string()))?;
+    let (icon_bytes, tooltip) = match state {
+        TrayState::Idle       => (TRAY_IDLE,       "VoiceFlow - Idle"),
+        TrayState::Recording  => (TRAY_RECORDING,  "VoiceFlow - Recording..."),
+        TrayState::Processing => (TRAY_PROCESSING, "VoiceFlow - Processing..."),
+    };
 
-    Ok(())
+    if let Some(icon) = png_to_image(icon_bytes) {
+        let _ = tray.set_icon(Some(icon));
+    }
+    let _ = tray.set_tooltip(Some(tooltip));
 }

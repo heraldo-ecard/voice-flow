@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="r" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+    <filter id="g" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="1.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background with red glow border -->
+  <rect x="1" y="1" width="30" height="30" rx="7"
+        fill="#0F2040" stroke="rgba(239,68,68,0.5)" stroke-width="0.75"/>
+  <!-- Waveform bars — red, glowing (recording) -->
+  <rect x="2"  y="14" width="4" height="4"  rx="2" fill="url(#r)" opacity="0.55" filter="url(#g)"/>
+  <rect x="8"  y="9"  width="4" height="14" rx="2" fill="url(#r)" opacity="0.8"  filter="url(#g)"/>
+  <rect x="14" y="5"  width="4" height="22" rx="2" fill="url(#r)"                filter="url(#g)"/>
+  <rect x="20" y="9"  width="4" height="14" rx="2" fill="url(#r)" opacity="0.8"  filter="url(#g)"/>
+  <rect x="26" y="14" width="4" height="4"  rx="2" fill="url(#r)" opacity="0.55" filter="url(#g)"/>
+  <!-- Recording dot indicator -->
+  <circle cx="16" cy="29" r="1.5" fill="#EF4444"/>
+</svg>

@@ -33,6 +33,7 @@ keyring = { version = "3", features = ["sync-secret-service", "windows-native", 
 thiserror = "2"
 uuid = { version = "1", features = ["v4"] }
 dotenvy = "0.15"
+image = { version = "0.25", default-features = false, features = ["png"] }
 
 [profile.release]
 strip = true

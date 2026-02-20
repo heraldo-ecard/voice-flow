@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="b" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E6FFF"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <filter id="g" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="1.2" result="bl"/>
+      <feMerge><feMergeNode in="bl"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background with brand blue border -->
+  <rect x="1" y="1" width="30" height="30" rx="7"
+        fill="#0F2040" stroke="rgba(30,111,255,0.5)" stroke-width="0.75"/>
+  <!-- Waveform bars — brand blue, glowing (processing) -->
+  <rect x="2"  y="12" width="4" height="8"  rx="2" fill="url(#b)" opacity="0.45" filter="url(#g)"/>
+  <rect x="8"  y="9"  width="4" height="14" rx="2" fill="url(#b)" opacity="0.65" filter="url(#g)"/>
+  <rect x="14" y="6"  width="4" height="20" rx="2" fill="url(#b)"                filter="url(#g)"/>
+  <rect x="20" y="9"  width="4" height="14" rx="2" fill="url(#b)" opacity="0.65" filter="url(#g)"/>
+  <rect x="26" y="12" width="4" height="8"  rx="2" fill="url(#b)" opacity="0.45" filter="url(#g)"/>
+  <!-- Processing dot indicator -->
+  <circle cx="16" cy="29" r="1.5" fill="url(#b)" filter="url(#g)"/>
+</svg>

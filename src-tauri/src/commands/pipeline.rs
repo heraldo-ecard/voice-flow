@@ -2,6 +2,7 @@ use crate::api::groq;
 use crate::audio::encoder;
 use crate::commands::injector;
 use crate::errors::{Result, VoiceFlowError};
+use crate::tray::{self, TrayState};
 use crate::AppState;
 use serde::Serialize;
 use std::time::Instant;
@@ -43,6 +44,7 @@ pub async fn start_recording(app: AppHandle) -> std::result::Result<(), String> 
     let mut audio = state.audio.lock().map_err(|e| e.to_string())?;
     audio.start_recording().map_err(|e| e.to_string())?;
     emit_state(&app, PipelineState::Recording);
+    tray::update_tray_state(&app, TrayState::Recording);
     Ok(())
 }
 
@@ -57,6 +59,7 @@ pub async fn stop_and_process(app: AppHandle) -> std::result::Result<PipelineRes
     }
     // Hide overlay before going idle so the pill never shows empty
     super::overlay::hide_overlay(&app);
+    tray::update_tray_state(&app, TrayState::Idle);
     emit_state(&app, PipelineState::Idle);
     result.map_err(|e| e.to_string())
 }
@@ -80,6 +83,7 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
 
     // 2. Encode WAV
     emit_state(app, PipelineState::Encoding);
+    tray::update_tray_state(app, TrayState::Processing);
     let wav_data = encoder::encode_wav(&samples, sample_rate)?;
 
     // 3. Get settings - API key always from keychain, other settings from DB
