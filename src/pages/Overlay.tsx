@@ -41,9 +41,13 @@ export default function Overlay() {
       style={{ background: "transparent" }}
       data-tauri-drag-region
     >
-      <div className="bg-gray-900/90 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 shadow-2xl border border-white/10">
+      {/* Fixed-width pill so it never resizes between states */}
+      <div
+        className="bg-gray-900/90 backdrop-blur-md rounded-full py-2.5 flex items-center justify-center shadow-2xl border border-white/10"
+        style={{ width: 220 }}
+      >
         {isRecording && (
-          <>
+          <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
             <div className="flex items-center gap-[2px] h-7">
               {levels.map((level, i) => (
@@ -57,10 +61,10 @@ export default function Overlay() {
                 />
               ))}
             </div>
-          </>
+          </div>
         )}
         {isProcessing && (
-          <div className="flex items-center gap-2.5 px-1">
+          <div className="flex items-center gap-2.5">
             <div className="flex gap-1">
               <div
                 className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce"

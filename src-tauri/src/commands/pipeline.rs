@@ -55,14 +55,9 @@ pub async fn stop_and_process(app: AppHandle) -> std::result::Result<PipelineRes
         }
         Err(_) => {}
     }
+    // Hide overlay before going idle so the pill never shows empty
+    super::overlay::hide_overlay(&app);
     emit_state(&app, PipelineState::Idle);
-    // Hide overlay after pipeline completes (success or error)
-    // Small delay so user sees the result briefly
-    let app_clone = app.clone();
-    tauri::async_runtime::spawn(async move {
-        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-        super::overlay::hide_overlay(&app_clone);
-    });
     result.map_err(|e| e.to_string())
 }
 
