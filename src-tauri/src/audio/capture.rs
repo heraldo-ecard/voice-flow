@@ -1,5 +1,6 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::SampleFormat;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 
 use crate::errors::{Result, VoiceFlowError};
@@ -13,6 +14,8 @@ type SampleBuffer = Arc<Mutex<Vec<f32>>>;
 pub struct AudioState {
     samples: SampleBuffer,
     recording: Arc<std::sync::atomic::AtomicBool>,
+    /// Current audio RMS level (f32 stored as u32 bits for atomic access).
+    level: Arc<AtomicU32>,
     sample_rate: u32,
     stop_signal: Option<std::sync::mpsc::Sender<()>>,
     join_handle: Option<std::thread::JoinHandle<()>>,
@@ -29,10 +32,16 @@ impl AudioState {
         Self {
             samples: Arc::new(Mutex::new(Vec::new())),
             recording: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            level: Arc::new(AtomicU32::new(0)),
             sample_rate: 0,
             stop_signal: None,
             join_handle: None,
         }
+    }
+
+    /// Get the current audio RMS level (0.0 to ~1.0).
+    pub fn get_level(&self) -> f32 {
+        f32::from_bits(self.level.load(Ordering::Relaxed))
     }
 
     pub fn is_recording(&self) -> bool {
@@ -64,6 +73,7 @@ impl AudioState {
 
         let samples = self.samples.clone();
         let recording = self.recording.clone();
+        let level = self.level.clone();
         let (stop_tx, stop_rx) = std::sync::mpsc::channel::<()>();
         self.stop_signal = Some(stop_tx);
 
@@ -74,15 +84,24 @@ impl AudioState {
             let stream = match sample_format {
                 SampleFormat::F32 => {
                     let samples = samples.clone();
+                    let level = level.clone();
                     device.build_input_stream(
                         &config.into(),
                         move |data: &[f32], _: &cpal::InputCallbackInfo| {
+                            let mut rms_sum = 0.0f32;
+                            let mut count = 0usize;
                             if let Ok(mut buf) = samples.lock() {
                                 for chunk in data.chunks(channels) {
                                     let mono: f32 =
                                         chunk.iter().sum::<f32>() / channels as f32;
                                     buf.push(mono);
+                                    rms_sum += mono * mono;
+                                    count += 1;
                                 }
+                            }
+                            if count > 0 {
+                                let rms = (rms_sum / count as f32).sqrt();
+                                level.store(rms.to_bits(), Ordering::Relaxed);
                             }
                         },
                         |err| log::error!("Audio stream error: {}", err),
@@ -91,9 +110,12 @@ impl AudioState {
                 }
                 SampleFormat::I16 => {
                     let samples = samples.clone();
+                    let level = level.clone();
                     device.build_input_stream(
                         &config.into(),
                         move |data: &[i16], _: &cpal::InputCallbackInfo| {
+                            let mut rms_sum = 0.0f32;
+                            let mut count = 0usize;
                             if let Ok(mut buf) = samples.lock() {
                                 for chunk in data.chunks(channels) {
                                     let mono: f32 = chunk
@@ -102,7 +124,13 @@ impl AudioState {
                                         .sum::<f32>()
                                         / channels as f32;
                                     buf.push(mono);
+                                    rms_sum += mono * mono;
+                                    count += 1;
                                 }
+                            }
+                            if count > 0 {
+                                let rms = (rms_sum / count as f32).sqrt();
+                                level.store(rms.to_bits(), Ordering::Relaxed);
                             }
                         },
                         |err| log::error!("Audio stream error: {}", err),

@@ -48,7 +48,12 @@ async fn on_hotkey_press(app: &AppHandle) {
 
     if !is_recording {
         match crate::commands::pipeline::start_recording(app.clone()).await {
-            Ok(_) => log::info!("Recording started via hotkey"),
+            Ok(_) => {
+                log::info!("Recording started via hotkey");
+                // Show overlay and start emitting audio levels
+                crate::commands::overlay::show_overlay(app);
+                crate::commands::overlay::start_audio_level_emitter(app.clone());
+            }
             Err(e) => {
                 log::error!("Recording start error: {}", e);
                 let _ = tauri::Emitter::emit(app, "pipeline-error", e);

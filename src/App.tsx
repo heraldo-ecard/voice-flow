@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { HashRouter, Routes, Route, NavLink } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { LayoutDashboard, Settings as SettingsIcon } from "lucide-react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import Overlay from "./pages/Overlay";
 import Onboarding from "./components/Onboarding";
 import { useTauriEvents } from "./hooks/useTauriEvents";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -87,5 +89,11 @@ function AppContent() {
 }
 
 export default function App() {
+  // If this is the overlay window, render only the overlay component
+  const windowLabel = getCurrentWindow().label;
+  if (windowLabel === "overlay") {
+    return <Overlay />;
+  }
+
   return <AppContent />;
 }

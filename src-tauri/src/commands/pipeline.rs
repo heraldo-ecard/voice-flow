@@ -48,10 +48,22 @@ pub async fn start_recording(app: AppHandle) -> std::result::Result<(), String> 
 
 #[tauri::command]
 pub async fn stop_and_process(app: AppHandle) -> std::result::Result<PipelineResult, String> {
-    let result = run_pipeline(&app).await.map_err(|e| e.to_string())?;
-    let _ = app.emit("pipeline-complete", &result);
+    let result = run_pipeline(&app).await;
+    match &result {
+        Ok(r) => {
+            let _ = app.emit("pipeline-complete", r);
+        }
+        Err(_) => {}
+    }
     emit_state(&app, PipelineState::Idle);
-    Ok(result)
+    // Hide overlay after pipeline completes (success or error)
+    // Small delay so user sees the result briefly
+    let app_clone = app.clone();
+    tauri::async_runtime::spawn(async move {
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+        super::overlay::hide_overlay(&app_clone);
+    });
+    result.map_err(|e| e.to_string())
 }
 
 async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
