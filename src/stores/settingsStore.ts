@@ -9,6 +9,7 @@ interface SettingsState {
   hotkey: string;
   darkMode: boolean;
   autostart: boolean;
+  rawMode: boolean;
   loading: boolean;
 
   loadSettings: () => Promise<void>;
@@ -25,6 +26,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   hotkey: "Ctrl+Shift+Space",
   darkMode: false,
   autostart: false,
+  rawMode: false,
   loading: true,
 
   loadSettings: async () => {
@@ -36,6 +38,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         "hotkey",
         "dark_mode",
         "autostart",
+        "raw_mode",
       ];
 
       const results: Record<string, string | null> = {};
@@ -59,6 +62,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         hotkey: results.hotkey || "Ctrl+Shift+Space",
         darkMode: results.dark_mode === "true",
         autostart: results.autostart === "true",
+        rawMode: results.raw_mode === "true",
         loading: false,
       });
     } catch (err) {
@@ -82,12 +86,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       hotkey: "hotkey",
       dark_mode: "darkMode",
       autostart: "autostart",
+      raw_mode: "rawMode",
     };
 
     const field = fieldMap[key];
     if (field) {
       const parsed =
-        field === "darkMode" || field === "autostart"
+        field === "darkMode" || field === "autostart" || field === "rawMode"
           ? value === "true"
           : value;
       set({ [field]: parsed } as Partial<SettingsState>);

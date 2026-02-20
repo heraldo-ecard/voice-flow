@@ -91,7 +91,7 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
         ));
     }
 
-    let (stt_model, llm_model, language) = {
+    let (stt_model, llm_model, language, raw_mode) = {
         let state = app.state::<AppState>();
         let db = state
             .db
@@ -112,7 +112,13 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
             .ok()
             .flatten()
             .unwrap_or_else(|| "pt".to_string());
-        (stt_model, llm_model, language)
+        let raw_mode = db
+            .get_setting("raw_mode")
+            .ok()
+            .flatten()
+            .map(|v| v == "true")
+            .unwrap_or(false);
+        (stt_model, llm_model, language, raw_mode)
     };
 
     // 4. Transcribe
@@ -125,11 +131,17 @@ async fn run_pipeline(app: &AppHandle) -> Result<PipelineResult> {
         return Err(VoiceFlowError::Pipeline("Empty transcription".into()));
     }
 
-    // 5. Refine with LLM
-    emit_state(app, PipelineState::Refining);
-    let t_llm = Instant::now();
-    let refined_text = groq::refine(&api_key, &raw_text, &llm_model, &language).await?;
-    let llm_latency = t_llm.elapsed().as_millis() as u64;
+    // 5. Refine with LLM (skip if raw mode enabled)
+    let (refined_text, llm_latency) = if raw_mode {
+        log::info!("Raw mode enabled — skipping LLM refinement");
+        (raw_text.clone(), 0u64)
+    } else {
+        emit_state(app, PipelineState::Refining);
+        let t_llm = Instant::now();
+        let text = groq::refine(&api_key, &raw_text, &llm_model, &language).await?;
+        let latency = t_llm.elapsed().as_millis() as u64;
+        (text, latency)
+    };
 
     // 6. Inject text into the currently focused input field
     emit_state(app, PipelineState::Injecting);
