@@ -5,7 +5,8 @@ import TranscriptionCard from "../components/TranscriptionCard";
 import MetricsWidget from "../components/MetricsWidget";
 import CostTracker from "../components/CostTracker";
 import RecordingIndicator from "../components/RecordingIndicator";
-import { Search, Mic } from "lucide-react";
+import { Search, Mic, Zap } from "lucide-react";
+import { useSettingsStore } from "../stores/settingsStore";
 import type { Transcription, TranscriptionStats } from "../types";
 
 export default function Dashboard() {
@@ -16,6 +17,8 @@ export default function Dashboard() {
   const [hasMore, setHasMore] = useState(true);
   const pipelineState = usePipelineStore((s) => s.state);
   const lastResult = usePipelineStore((s) => s.lastResult);
+  const rawMode = useSettingsStore((s) => s.rawMode);
+  const setSetting = useSettingsStore((s) => s.setSetting);
 
   const LIMIT = 20;
 
@@ -95,9 +98,26 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-sans)", fontWeight: 700 }}>
           Dashboard
         </h1>
-        <button
-          onClick={handleRecord}
-          disabled={pipelineState !== "idle" && pipelineState !== "recording"}
+        <div className="flex items-center gap-2">
+          {/* Fast Mode toggle */}
+          <button
+            onClick={() => setSetting("raw_mode", String(!rawMode))}
+            disabled={pipelineState !== "idle"}
+            title={rawMode ? "Fast Mode on — skipping LLM refinement" : "Fast Mode off — LLM refinement active"}
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
+            style={
+              rawMode
+                ? { background: "linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)", color: "#1a1a1a" }
+                : { background: "transparent", border: "1px solid var(--color-border)", color: "var(--color-text-muted)" }
+            }
+          >
+            <Zap className="w-3.5 h-3.5" />
+            Fast
+          </button>
+
+          <button
+            onClick={handleRecord}
+            disabled={pipelineState !== "idle" && pipelineState !== "recording"}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150${pipelineState === "idle" ? " hover-lift" : ""}`}
           style={
             pipelineState === "recording"
@@ -113,7 +133,8 @@ export default function Dashboard() {
             : pipelineState === "idle"
               ? "Record"
               : "Processing..."}
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* Recording indicator */}
