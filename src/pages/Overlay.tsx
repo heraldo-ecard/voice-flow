@@ -43,7 +43,7 @@ export default function Overlay() {
     >
       <div
         className="bg-gray-900/90 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10"
-        style={{ width: 150, height: 32 }}
+        style={{ width: 138, height: 32 }}
       >
         {isRecording && (
           <div className="flex items-center gap-1.5">
