@@ -149,7 +149,7 @@ export default function Dashboard() {
             placeholder="Search transcriptions..."
             className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-150"
             style={{
-              background: "rgba(255, 255, 255, 0.04)",
+              background: "var(--color-input-bg)",
               border: "1px solid var(--color-border)",
               color: "var(--color-text-primary)",
               fontFamily: "var(--font-sans)",

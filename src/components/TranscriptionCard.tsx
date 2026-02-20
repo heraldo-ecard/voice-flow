@@ -31,7 +31,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
     <div
       className="rounded-xl p-4 transition-all duration-150 animate-fade-up"
       style={{
-        background: "var(--color-input-bg)",
+        background: "var(--color-surface-raised)",
         border: "1px solid var(--color-border)",
       }}
       onMouseEnter={(e) => {

@@ -48,21 +48,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ===== Brand Tokens: Dark Mode ===== */
+/* ===== Brand Tokens: Dark Mode (VSCode Dark Modern) ===== */
 [data-theme="dark"] {
-  --color-bg: #0A1628;
-  --color-surface: #0F2040;
-  --color-surface-raised: #152A52;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #CBD5E1;
-  --color-text-muted: #64748B;
-  --color-border: rgba(30, 111, 255, 0.15);
-  --color-border-hover: rgba(30, 111, 255, 0.40);
-  --color-input-bg: rgba(255, 255, 255, 0.04);
-  --color-card-bg: #0F2040;
-  --color-card-gradient: linear-gradient(180deg, #0F2040 0%, #0A1628 100%);
-  --color-raw-bg: #020C1A;
-  --color-shadow-base: rgba(0, 0, 0, 0.4);
+  --color-bg: #1e1e1e;
+  --color-surface: #252526;
+  --color-surface-raised: #2d2d2d;
+  --color-text-primary: #cccccc;
+  --color-text-secondary: #9d9d9d;
+  --color-text-muted: #6a6a6a;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-hover: rgba(30, 111, 255, 0.55);
+  --color-input-bg: #3c3c3c;
+  --color-card-bg: #2d2d2d;
+  --color-card-gradient: linear-gradient(180deg, #2d2d2d 0%, #252526 100%);
+  --color-raw-bg: #1e1e1e;
+  --color-shadow-base: rgba(0, 0, 0, 0.5);
   --color-shadow-hover: rgba(30, 111, 255, 0.12);
 }
 
