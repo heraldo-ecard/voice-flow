@@ -1,5 +1,6 @@
 import { DollarSign } from "lucide-react";
 import type { TranscriptionStats } from "../types";
+import { useTranslation } from "../i18n";
 
 interface Props {
   stats: TranscriptionStats;
@@ -9,6 +10,7 @@ const COST_PER_TRANSCRIPTION_ESTIMATE = 0.001;
 const COST_PER_REFINEMENT_ESTIMATE = 0.0003;
 
 export default function CostTracker({ stats }: Props) {
+  const { t } = useTranslation();
   const costPerItem = COST_PER_TRANSCRIPTION_ESTIMATE + COST_PER_REFINEMENT_ESTIMATE;
   const totalCost = stats.total_transcriptions * costPerItem;
 
@@ -23,7 +25,7 @@ export default function CostTracker({ stats }: Props) {
     >
       <div className="flex items-center gap-2 mb-2">
         <DollarSign className="w-4 h-4" style={{ color: "var(--color-success)" }} />
-        <h3 className="font-semibold text-sm">Estimated Cost</h3>
+        <h3 className="font-semibold text-sm">{t("cost.title")}</h3>
       </div>
       <div className="flex items-baseline gap-2">
         <span
@@ -45,11 +47,11 @@ export default function CostTracker({ stats }: Props) {
             border: "1px solid rgba(16, 185, 129, 0.25)",
           }}
         >
-          {stats.total_transcriptions} transcriptions
+          {t("cost.transcriptions", { count: stats.total_transcriptions })}
         </span>
       </div>
       <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-        Based on Groq pricing estimates. Actual costs may vary.
+        {t("cost.disclaimer")}
       </p>
     </div>
   );

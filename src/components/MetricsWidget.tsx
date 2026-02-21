@@ -1,38 +1,40 @@
-import { useMemo } from "react";
 import { MessageSquare, Clock, TrendingUp, Calendar } from "lucide-react";
 import type { TranscriptionStats } from "../types";
+import { useTranslation } from "../i18n";
 
 interface Props {
   stats: TranscriptionStats;
 }
 
 export default function MetricsWidget({ stats }: Props) {
-  const metrics = useMemo(() => [
+  const { t } = useTranslation();
+
+  const metrics = [
     {
-      label: "Words Today",
+      label: t("metrics.wordsToday"),
       value: stats.words_today.toLocaleString(),
       icon: TrendingUp,
       color: "#10B981",
     },
     {
-      label: "This Week",
+      label: t("metrics.thisWeek"),
       value: stats.words_this_week.toLocaleString(),
       icon: Calendar,
       color: "#1E6FFF",
     },
     {
-      label: "This Month",
+      label: t("metrics.thisMonth"),
       value: stats.words_this_month.toLocaleString(),
       icon: MessageSquare,
       color: "#06B6D4",
     },
     {
-      label: "Avg Latency",
+      label: t("metrics.avgLatency"),
       value: `${Math.round(stats.avg_stt_latency_ms + stats.avg_llm_latency_ms)}ms`,
       icon: Clock,
       color: "#0EA5E9",
     },
-  ], [stats]);
+  ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

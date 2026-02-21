@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Copy, Trash2, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import toast from "react-hot-toast";
 import type { Transcription } from "../types";
+import { useTranslation } from "../i18n";
 
 interface Props {
   transcription: Transcription;
@@ -13,14 +14,15 @@ function formatDate(dateStr: string) {
 }
 
 export default function TranscriptionCard({ transcription, onDelete }: Props) {
+  const { t } = useTranslation();
   const [showRaw, setShowRaw] = useState(false);
 
   const copyText = async () => {
     try {
       await navigator.clipboard.writeText(transcription.refined_text);
-      toast.success("Copied to clipboard");
+      toast.success(t("card.copied"));
     } catch {
-      toast.error("Failed to copy");
+      toast.error(t("card.copyFailed"));
     }
   };
 
@@ -41,7 +43,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
             onClick={copyText}
             className="p-1.5 rounded transition-colors duration-150 hover-brand-light"
             style={{ color: "var(--color-text-muted)" }}
-            title="Copy"
+            title={t("card.copy")}
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
@@ -49,7 +51,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
             onClick={onDelete}
             className="p-1.5 rounded transition-colors duration-150 hover-error"
             style={{ color: "var(--color-text-muted)" }}
-            title="Delete"
+            title={t("card.delete")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -58,7 +60,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
 
       <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <span>{formatDate(transcription.created_at)}</span>
-        <span>{transcription.word_count} words</span>
+        <span>{t("card.words", { count: transcription.word_count })}</span>
         <span className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           <span
@@ -79,7 +81,7 @@ export default function TranscriptionCard({ transcription, onDelete }: Props) {
           className="flex items-center gap-0.5 ml-auto transition-colors duration-150 hover-text-secondary"
           style={{ color: "var(--color-text-muted)" }}
         >
-          Raw
+          {t("card.raw")}
           {showRaw ? (
             <ChevronUp className="w-3 h-3" />
           ) : (

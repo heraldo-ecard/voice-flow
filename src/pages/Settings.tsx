@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSettingsStore } from "../stores/settingsStore";
 import { Settings as SettingsIcon, Key, Mic, Brain, Globe, Keyboard, Moon, Power, Zap } from "lucide-react";
+import { useTranslation } from "../i18n";
 
 const inputStyle: React.CSSProperties = {
   background: "var(--color-input-bg)",
@@ -55,6 +56,7 @@ export default function Settings() {
     sttModel,
     llmModel,
     language,
+    uiLanguage,
     hotkey,
     darkMode,
     autostart,
@@ -64,6 +66,7 @@ export default function Settings() {
     setSetting,
     toggleDarkMode,
   } = useSettingsStore();
+  const { t } = useTranslation();
 
   const [localApiKey, setLocalApiKey] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
@@ -84,14 +87,14 @@ export default function Settings() {
     <div className="p-6 max-w-2xl mx-auto space-y-5">
       <div className="flex items-center gap-2 mb-8">
         <SettingsIcon className="w-6 h-6" style={{ color: "var(--color-text-muted)" }} />
-        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-sans)" }}>Settings</h1>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-sans)" }}>{t("settings.title")}</h1>
       </div>
 
       {/* API Key */}
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Key className="w-4 h-4" style={{ color: "var(--color-warning)" }} />
-          <h2 className="font-semibold text-sm">Groq API Key</h2>
+          <h2 className="font-semibold text-sm">{t("settings.apiKey")}</h2>
         </div>
         <div className="flex gap-2">
           <input
@@ -111,18 +114,18 @@ export default function Settings() {
               color: "var(--color-text-secondary)",
             }}
           >
-            {showKey ? "Hide" : "Show"}
+            {showKey ? t("settings.hide") : t("settings.show")}
           </button>
           <button
             onClick={handleSaveApiKey}
             className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-all duration-150"
             style={{ background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)" }}
           >
-            Save
+            {t("settings.save")}
           </button>
         </div>
         <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-          Stored securely in your OS keychain. Get a key at{" "}
+          {t("settings.apiKeyDesc")}{" "}
           <span style={{ color: "var(--color-brand-light)" }}>console.groq.com</span>
         </p>
       </section>
@@ -131,7 +134,7 @@ export default function Settings() {
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Mic className="w-4 h-4" style={{ color: "var(--color-error)" }} />
-          <h2 className="font-semibold text-sm">STT Model</h2>
+          <h2 className="font-semibold text-sm">{t("settings.sttModel")}</h2>
         </div>
         <select
           value={sttModel}
@@ -149,7 +152,7 @@ export default function Settings() {
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Brain className="w-4 h-4" style={{ color: "var(--color-brand)" }} />
-          <h2 className="font-semibold text-sm">LLM Model (Refinement)</h2>
+          <h2 className="font-semibold text-sm">{t("settings.llmModel")}</h2>
         </div>
         <select
           value={llmModel}
@@ -176,11 +179,11 @@ export default function Settings() {
         </select>
       </section>
 
-      {/* Language */}
+      {/* Transcription Language */}
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Globe className="w-4 h-4" style={{ color: "var(--color-success)" }} />
-          <h2 className="font-semibold text-sm">Language</h2>
+          <h2 className="font-semibold text-sm">{t("settings.transcriptionLanguage")}</h2>
         </div>
         <select
           value={language}
@@ -188,15 +191,33 @@ export default function Settings() {
           className="input-branded"
           style={inputStyle}
         >
-          <option value="pt">Portuguese</option>
+          <option value="pt">{t("settings.languages.pt")}</option>
+          <option value="en">{t("settings.languages.en")}</option>
+          <option value="es">{t("settings.languages.es")}</option>
+          <option value="fr">{t("settings.languages.fr")}</option>
+          <option value="de">{t("settings.languages.de")}</option>
+          <option value="it">{t("settings.languages.it")}</option>
+          <option value="ja">{t("settings.languages.ja")}</option>
+          <option value="ko">{t("settings.languages.ko")}</option>
+          <option value="zh">{t("settings.languages.zh")}</option>
+        </select>
+      </section>
+
+      {/* Interface Language */}
+      <section style={cardStyle}>
+        <div className="flex items-center gap-2 mb-3">
+          <Globe className="w-4 h-4" style={{ color: "var(--color-brand-light)" }} />
+          <h2 className="font-semibold text-sm">{t("settings.interfaceLanguage")}</h2>
+        </div>
+        <select
+          value={uiLanguage}
+          onChange={(e) => setSetting("ui_language", e.target.value)}
+          className="input-branded"
+          style={inputStyle}
+        >
           <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="it">Italian</option>
-          <option value="ja">Japanese</option>
-          <option value="ko">Korean</option>
-          <option value="zh">Chinese</option>
+          <option value="pt">Português</option>
+          <option value="es">Español</option>
         </select>
       </section>
 
@@ -204,7 +225,7 @@ export default function Settings() {
       <section style={cardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Keyboard className="w-4 h-4" style={{ color: "var(--color-brand-light)" }} />
-          <h2 className="font-semibold text-sm">Hotkey</h2>
+          <h2 className="font-semibold text-sm">{t("settings.hotkey")}</h2>
         </div>
         <input
           type="text"
@@ -213,7 +234,7 @@ export default function Settings() {
           style={{ ...inputStyle, cursor: "default" }}
         />
         <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-          Hold to record, release to process. Customization coming soon.
+          {t("settings.hotkeyDesc")}
         </p>
       </section>
 
@@ -222,7 +243,7 @@ export default function Settings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Moon className="w-4 h-4" style={{ color: "var(--color-brand-cyan)" }} />
-            <span className="font-semibold text-sm">Dark Mode</span>
+            <span className="font-semibold text-sm">{t("settings.darkMode")}</span>
           </div>
           <Toggle checked={darkMode} onChange={toggleDarkMode} />
         </div>
@@ -230,7 +251,7 @@ export default function Settings() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Power className="w-4 h-4" style={{ color: "var(--color-success)" }} />
-            <span className="font-semibold text-sm">Start with OS</span>
+            <span className="font-semibold text-sm">{t("settings.startWithOS")}</span>
           </div>
           <Toggle
             checked={autostart}
@@ -242,9 +263,9 @@ export default function Settings() {
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4" style={{ color: "var(--color-warning)" }} />
             <div>
-              <span className="font-semibold text-sm">Raw Mode</span>
+              <span className="font-semibold text-sm">{t("settings.rawMode")}</span>
               <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                Skip LLM — inject Whisper output directly
+                {t("settings.rawModeDesc")}
               </p>
             </div>
           </div>

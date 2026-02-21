@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useSettingsStore } from "../stores/settingsStore";
 import { Mic, Key, CheckCircle } from "lucide-react";
+import { useTranslation } from "../i18n";
 
 interface Props {
   onComplete: () => void;
 }
 
 function StepWelcome({ onNext }: { onNext: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="text-center space-y-5">
       <div
@@ -27,15 +29,14 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         VoiceFlow
       </h1>
       <p className="max-w-md mx-auto" style={{ color: "var(--color-text-secondary)", fontSize: "15px" }}>
-        Voice dictation powered by AI. Speak naturally and have your words
-        transcribed, refined, and injected into any text field.
+        {t("onboarding.tagline")}
       </p>
       <button
         onClick={onNext}
         className="px-6 py-2.5 rounded-lg font-medium text-white transition-all duration-150 hover-lift"
         style={{ background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)" }}
       >
-        Get Started
+        {t("onboarding.getStarted")}
       </button>
     </div>
   );
@@ -44,6 +45,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
 function StepApiKey({ onNext }: { onNext: () => void }) {
   const [apiKey, setApiKey] = useState("");
   const { setApiKey: saveApiKey } = useSettingsStore();
+  const { t } = useTranslation();
 
   const handleSave = async () => {
     if (!apiKey.trim()) return;
@@ -59,10 +61,9 @@ function StepApiKey({ onNext }: { onNext: () => void }) {
       >
         <Key className="w-8 h-8" style={{ color: "var(--color-warning)" }} />
       </div>
-      <h2 className="text-xl font-bold">Enter your Groq API Key</h2>
+      <h2 className="text-xl font-bold">{t("onboarding.apiKeyTitle")}</h2>
       <p className="text-sm max-w-md mx-auto" style={{ color: "var(--color-text-secondary)" }}>
-        VoiceFlow uses Groq for fast speech-to-text and text refinement.
-        Get a free API key at{" "}
+        {t("onboarding.apiKeyDesc")}{" "}
         <span style={{ color: "var(--color-brand-light)" }}>console.groq.com</span>
       </p>
       <input
@@ -85,13 +86,16 @@ function StepApiKey({ onNext }: { onNext: () => void }) {
         className="px-6 py-2.5 rounded-lg font-medium text-white transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         style={{ background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)" }}
       >
-        Save & Continue
+        {t("onboarding.saveAndContinue")}
       </button>
     </div>
   );
 }
 
 function StepDone({ onComplete }: { onComplete: () => void }) {
+  const { t } = useTranslation();
+  const hotkey = useSettingsStore((s) => s.hotkey);
+  const [descBefore, descAfter] = t("onboarding.doneDesc").split("{{hotkey}}");
   return (
     <div className="text-center space-y-5">
       <div
@@ -100,9 +104,9 @@ function StepDone({ onComplete }: { onComplete: () => void }) {
       >
         <CheckCircle className="w-8 h-8" style={{ color: "var(--color-success)" }} />
       </div>
-      <h2 className="text-xl font-bold">You're all set!</h2>
+      <h2 className="text-xl font-bold">{t("onboarding.doneTitle")}</h2>
       <p className="text-sm max-w-md mx-auto" style={{ color: "var(--color-text-secondary)" }}>
-        Press{" "}
+        {descBefore}
         <kbd
           className="px-1.5 py-0.5 rounded text-xs"
           style={{
@@ -111,16 +115,16 @@ function StepDone({ onComplete }: { onComplete: () => void }) {
             border: "1px solid var(--color-border)",
           }}
         >
-          Ctrl+Shift+Space
-        </kbd>{" "}
-        to start recording. Your text will be transcribed and pasted into the active field.
+          {hotkey}
+        </kbd>
+        {descAfter}
       </p>
       <button
         onClick={onComplete}
         className="px-6 py-2.5 rounded-lg font-medium text-white transition-all duration-150 hover-lift-green"
         style={{ background: "linear-gradient(135deg, #10B981 0%, #06B6D4 100%)" }}
       >
-        Start Using VoiceFlow
+        {t("onboarding.startUsing")}
       </button>
     </div>
   );

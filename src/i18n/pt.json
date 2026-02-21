@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "dashboard": "Painel",
+    "settings": "Configurações"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "record": "Gravar",
+    "stop": "Parar",
+    "processing": "Processando...",
+    "fast": "Rápido",
+    "fastModeOn": "Modo Rápido ativo — refinamento LLM desativado",
+    "fastModeOff": "Modo Rápido desativado — refinamento LLM ativo",
+    "searchPlaceholder": "Buscar transcrições...",
+    "searchButton": "Buscar",
+    "emptyTitle": "Nenhuma transcrição ainda.",
+    "emptyHint": "Segure {{hotkey}} para gravar, solte para processar.",
+    "loadMore": "Carregar mais..."
+  },
+  "recording": {
+    "recording": "Gravando...",
+    "encoding": "Codificando áudio...",
+    "transcribing": "Transcrevendo...",
+    "refining": "Refinando texto...",
+    "injecting": "Injetando texto..."
+  },
+  "card": {
+    "copy": "Copiar",
+    "delete": "Excluir",
+    "words": "{{count}} palavras",
+    "raw": "Bruto",
+    "copied": "Copiado para a área de transferência",
+    "copyFailed": "Falha ao copiar"
+  },
+  "metrics": {
+    "wordsToday": "Palavras Hoje",
+    "thisWeek": "Esta Semana",
+    "thisMonth": "Este Mês",
+    "avgLatency": "Latência Média"
+  },
+  "cost": {
+    "title": "Custo Estimado",
+    "transcriptions": "{{count}} transcrições",
+    "disclaimer": "Baseado em estimativas de preços da Groq. Os custos reais podem variar."
+  },
+  "overlay": {
+    "processing": "Processando"
+  },
+  "onboarding": {
+    "tagline": "Ditado por voz com IA. Fale naturalmente e suas palavras serão transcritas, refinadas e inseridas em qualquer campo de texto.",
+    "getStarted": "Começar",
+    "apiKeyTitle": "Insira sua chave de API Groq",
+    "apiKeyDesc": "O VoiceFlow usa Groq para transcrição de fala rápida e refinamento de texto. Obtenha uma chave gratuita em",
+    "saveAndContinue": "Salvar e Continuar",
+    "doneTitle": "Tudo pronto!",
+    "doneDesc": "Pressione {{hotkey}} para começar a gravar. Seu texto será transcrito e colado no campo ativo.",
+    "startUsing": "Começar a Usar o VoiceFlow"
+  },
+  "settings": {
+    "title": "Configurações",
+    "apiKey": "Chave de API Groq",
+    "apiKeyDesc": "Armazenada com segurança no chaveiro do SO. Obtenha uma chave em",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "save": "Salvar",
+    "sttModel": "Modelo STT",
+    "llmModel": "Modelo LLM (Refinamento)",
+    "transcriptionLanguage": "Idioma de Transcrição",
+    "interfaceLanguage": "Idioma da Interface",
+    "hotkey": "Atalho",
+    "hotkeyDesc": "Segure para gravar, solte para processar. Personalização em breve.",
+    "darkMode": "Modo Escuro",
+    "startWithOS": "Iniciar com o SO",
+    "rawMode": "Modo Bruto",
+    "rawModeDesc": "Pular LLM — injetar saída do Whisper diretamente",
+    "languages": {
+      "pt": "Português",
+      "en": "Inglês",
+      "es": "Espanhol",
+      "fr": "Francês",
+      "de": "Alemão",
+      "it": "Italiano",
+      "ja": "Japonês",
+      "ko": "Coreano",
+      "zh": "Chinês"
+    }
+  },
+  "toast": {
+    "transcribed": "Transcrito em {{ms}}ms",
+    "error": "Erro: {{message}}"
+  }
+}

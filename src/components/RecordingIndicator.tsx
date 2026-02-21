@@ -1,5 +1,6 @@
 import { Mic, Loader2 } from "lucide-react";
 import type { PipelineState } from "../stores/pipelineStore";
+import { useTranslation } from "../i18n";
 
 interface Props {
   state: PipelineState;
@@ -7,16 +8,18 @@ interface Props {
 
 const BAR_HEIGHTS = Array.from({ length: 5 }, (_, i) => 8 + ((i * 7 + 3) % 16));
 
-const stateLabels: Record<PipelineState, string> = {
-  idle: "",
-  recording: "Recording...",
-  encoding: "Encoding audio...",
-  transcribing: "Transcribing...",
-  refining: "Refining text...",
-  injecting: "Injecting text...",
-};
-
 export default function RecordingIndicator({ state }: Props) {
+  const { t } = useTranslation();
+
+  const stateLabels: Record<PipelineState, string> = {
+    idle: "",
+    recording: t("recording.recording"),
+    encoding: t("recording.encoding"),
+    transcribing: t("recording.transcribing"),
+    refining: t("recording.refining"),
+    injecting: t("recording.injecting"),
+  };
+
   if (state === "idle") return null;
 
   const isRecording = state === "recording";

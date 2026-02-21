@@ -9,6 +9,7 @@ import Overlay from "./pages/Overlay";
 import Onboarding from "./components/Onboarding";
 import { useTauriEvents } from "./hooks/useTauriEvents";
 import { useSettingsStore } from "./stores/settingsStore";
+import { useTranslation } from "./i18n";
 
 function applyTheme(dark: boolean) {
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
@@ -27,6 +28,7 @@ const TOAST_OPTIONS: ToasterProps["toastOptions"] = {
 function AppContent() {
   useTauriEvents();
   const { loadSettings, loading, darkMode } = useSettingsStore();
+  const { t } = useTranslation();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -76,7 +78,7 @@ function AppContent() {
                   color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
                   background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
                 })}
-                title="Dashboard"
+                title={t("nav.dashboard")}
               >
                 <LayoutDashboard className="w-5 h-5" />
               </NavLink>
@@ -87,7 +89,7 @@ function AppContent() {
                   color: isActive ? "var(--color-brand)" : "var(--color-text-muted)",
                   background: isActive ? "rgba(30, 111, 255, 0.12)" : "transparent",
                 })}
-                title="Settings"
+                title={t("nav.settings")}
               >
                 <SettingsIcon className="w-5 h-5" />
               </NavLink>

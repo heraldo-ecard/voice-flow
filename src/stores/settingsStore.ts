@@ -6,6 +6,7 @@ interface SettingsState {
   sttModel: string;
   llmModel: string;
   language: string;
+  uiLanguage: string;
   hotkey: string;
   darkMode: boolean;
   autostart: boolean;
@@ -23,6 +24,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   sttModel: "whisper-large-v3",
   llmModel: "llama-3.3-70b-versatile",
   language: "pt",
+  uiLanguage: "en",
   hotkey: "Ctrl+Shift+Space",
   darkMode: false,
   autostart: false,
@@ -35,6 +37,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         "stt_model",
         "llm_model",
         "language",
+        "ui_language",
         "hotkey",
         "dark_mode",
         "autostart",
@@ -61,6 +64,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         sttModel: results.stt_model || "whisper-large-v3",
         llmModel: results.llm_model || "llama-3.3-70b-versatile",
         language: results.language || "pt",
+        uiLanguage: results.ui_language || "en",
         hotkey: results.hotkey || "Ctrl+Shift+Space",
         darkMode: results.dark_mode === "true",
         autostart: results.autostart === "true",
@@ -82,12 +86,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await invoke("set_setting", { key, value });
 
     type BooleanField = "darkMode" | "autostart" | "rawMode";
-    type SettingField = BooleanField | "sttModel" | "llmModel" | "language" | "hotkey";
+    type SettingField = BooleanField | "sttModel" | "llmModel" | "language" | "uiLanguage" | "hotkey";
 
     const BACKEND_TO_STATE: Record<string, SettingField> = {
       stt_model: "sttModel",
       llm_model: "llmModel",
       language: "language",
+      ui_language: "uiLanguage",
       hotkey: "hotkey",
       dark_mode: "darkMode",
       autostart: "autostart",

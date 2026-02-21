@@ -8,16 +8,15 @@ import RecordingIndicator from "../components/RecordingIndicator";
 import { Search, Mic, Zap } from "lucide-react";
 import { useSettingsStore } from "../stores/settingsStore";
 import type { Transcription, TranscriptionStats } from "../types";
+import { useTranslation } from "../i18n";
 
-const RECORD_CONFIG = {
+const RECORD_STYLES = {
   recording: {
-    label: "Stop",
     style: { background: "var(--color-error)" } as React.CSSProperties,
     className:
       "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150",
   },
   idle: {
-    label: "Record",
     style: {
       background: "linear-gradient(135deg, #1E6FFF 0%, #0EA5E9 100%)",
     } as React.CSSProperties,
@@ -25,7 +24,6 @@ const RECORD_CONFIG = {
       "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150 hover-lift",
   },
   processing: {
-    label: "Processing...",
     style: {
       background: "var(--color-text-muted)",
       cursor: "not-allowed",
@@ -41,8 +39,14 @@ interface RecordButtonProps {
 }
 
 function RecordButton({ pipelineState, onClick }: RecordButtonProps) {
+  const { t } = useTranslation();
   const key = pipelineState === "idle" || pipelineState === "recording" ? pipelineState : "processing";
-  const config = RECORD_CONFIG[key];
+  const config = RECORD_STYLES[key];
+  const labels = {
+    recording: t("dashboard.stop"),
+    idle: t("dashboard.record"),
+    processing: t("dashboard.processing"),
+  };
   return (
     <button
       onClick={onClick}
@@ -51,7 +55,7 @@ function RecordButton({ pipelineState, onClick }: RecordButtonProps) {
       style={config.style}
     >
       <Mic className="w-4 h-4" />
-      {config.label}
+      {labels[key]}
     </button>
   );
 }
@@ -65,7 +69,9 @@ export default function Dashboard() {
   const pipelineState = usePipelineStore((s) => s.state);
   const lastResult = usePipelineStore((s) => s.lastResult);
   const rawMode = useSettingsStore((s) => s.rawMode);
+  const hotkey = useSettingsStore((s) => s.hotkey);
   const setSetting = useSettingsStore((s) => s.setSetting);
+  const { t } = useTranslation();
 
   const LIMIT = 20;
 
@@ -143,14 +149,14 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-sans)", fontWeight: 700 }}>
-          Dashboard
+          {t("dashboard.title")}
         </h1>
         <div className="flex items-center gap-2">
           {/* Fast Mode toggle */}
           <button
             onClick={() => setSetting("raw_mode", String(!rawMode))}
             disabled={pipelineState !== "idle"}
-            title={rawMode ? "Fast Mode on — skipping LLM refinement" : "Fast Mode off — LLM refinement active"}
+            title={rawMode ? t("dashboard.fastModeOn") : t("dashboard.fastModeOff")}
             className="flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
             style={{
               background: rawMode
@@ -162,7 +168,7 @@ export default function Dashboard() {
             }}
           >
             <Zap className="w-3.5 h-3.5" />
-            Fast
+            {t("dashboard.fast")}
           </button>
 
           <RecordButton pipelineState={pipelineState} onClick={handleRecord} />
@@ -187,7 +193,7 @@ export default function Dashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="Search transcriptions..."
+            placeholder={t("dashboard.searchPlaceholder")}
             className="w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-150 input-branded"
             style={{
               background: "var(--color-input-bg)",
@@ -206,7 +212,7 @@ export default function Dashboard() {
             color: "var(--color-text-secondary)",
           }}
         >
-          Search
+          {t("dashboard.searchButton")}
         </button>
       </div>
 
@@ -215,20 +221,27 @@ export default function Dashboard() {
         {transcriptions.length === 0 ? (
           <div className="text-center py-12" style={{ color: "var(--color-text-muted)" }}>
             <Mic className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>No transcriptions yet.</p>
+            <p>{t("dashboard.emptyTitle")}</p>
             <p className="text-sm mt-1">
-              Hold{" "}
-              <kbd
-                className="px-1.5 py-0.5 rounded text-xs"
-                style={{
-                  background: "var(--color-surface-raised)",
-                  fontFamily: "var(--font-mono)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                Ctrl+Shift+Space
-              </kbd>{" "}
-              to record, release to process.
+              {(() => {
+                const [before, after] = t("dashboard.emptyHint").split("{{hotkey}}");
+                return (
+                  <>
+                    {before}
+                    <kbd
+                      className="px-1.5 py-0.5 rounded text-xs"
+                      style={{
+                        background: "var(--color-surface-raised)",
+                        fontFamily: "var(--font-mono)",
+                        border: "1px solid var(--color-border)",
+                      }}
+                    >
+                      {hotkey}
+                    </kbd>
+                    {after}
+                  </>
+                );
+              })()}
             </p>
           </div>
         ) : (
@@ -249,7 +262,7 @@ export default function Dashboard() {
           className="w-full py-2 text-sm font-medium transition-colors duration-150 hover-brand-light"
           style={{ color: "var(--color-brand)" }}
         >
-          Load more...
+          {t("dashboard.loadMore")}
         </button>
       )}
     </div>

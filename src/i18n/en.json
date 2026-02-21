@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "record": "Record",
+    "stop": "Stop",
+    "processing": "Processing...",
+    "fast": "Fast",
+    "fastModeOn": "Fast Mode on — skipping LLM refinement",
+    "fastModeOff": "Fast Mode off — LLM refinement active",
+    "searchPlaceholder": "Search transcriptions...",
+    "searchButton": "Search",
+    "emptyTitle": "No transcriptions yet.",
+    "emptyHint": "Hold {{hotkey}} to record, release to process.",
+    "loadMore": "Load more..."
+  },
+  "recording": {
+    "recording": "Recording...",
+    "encoding": "Encoding audio...",
+    "transcribing": "Transcribing...",
+    "refining": "Refining text...",
+    "injecting": "Injecting text..."
+  },
+  "card": {
+    "copy": "Copy",
+    "delete": "Delete",
+    "words": "{{count}} words",
+    "raw": "Raw",
+    "copied": "Copied to clipboard",
+    "copyFailed": "Failed to copy"
+  },
+  "metrics": {
+    "wordsToday": "Words Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "avgLatency": "Avg Latency"
+  },
+  "cost": {
+    "title": "Estimated Cost",
+    "transcriptions": "{{count}} transcriptions",
+    "disclaimer": "Based on Groq pricing estimates. Actual costs may vary."
+  },
+  "overlay": {
+    "processing": "Processing"
+  },
+  "onboarding": {
+    "tagline": "Voice dictation powered by AI. Speak naturally and have your words transcribed, refined, and injected into any text field.",
+    "getStarted": "Get Started",
+    "apiKeyTitle": "Enter your Groq API Key",
+    "apiKeyDesc": "VoiceFlow uses Groq for fast speech-to-text and text refinement. Get a free API key at",
+    "saveAndContinue": "Save & Continue",
+    "doneTitle": "You're all set!",
+    "doneDesc": "Press {{hotkey}} to start recording. Your text will be transcribed and pasted into the active field.",
+    "startUsing": "Start Using VoiceFlow"
+  },
+  "settings": {
+    "title": "Settings",
+    "apiKey": "Groq API Key",
+    "apiKeyDesc": "Stored securely in your OS keychain. Get a key at",
+    "hide": "Hide",
+    "show": "Show",
+    "save": "Save",
+    "sttModel": "STT Model",
+    "llmModel": "LLM Model (Refinement)",
+    "transcriptionLanguage": "Transcription Language",
+    "interfaceLanguage": "Interface Language",
+    "hotkey": "Hotkey",
+    "hotkeyDesc": "Hold to record, release to process. Customization coming soon.",
+    "darkMode": "Dark Mode",
+    "startWithOS": "Start with OS",
+    "rawMode": "Raw Mode",
+    "rawModeDesc": "Skip LLM — inject Whisper output directly",
+    "languages": {
+      "pt": "Portuguese",
+      "en": "English",
+      "es": "Spanish",
+      "fr": "French",
+      "de": "German",
+      "it": "Italian",
+      "ja": "Japanese",
+      "ko": "Korean",
+      "zh": "Chinese"
+    }
+  },
+  "toast": {
+    "transcribed": "Transcribed in {{ms}}ms",
+    "error": "Error: {{message}}"
+  }
+}

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { usePipelineStore } from "../stores/pipelineStore";
+import { useSettingsStore } from "../stores/settingsStore";
+import { getTranslation } from "../i18n";
 import toast from "react-hot-toast";
 
 export function useTauriEvents() {
@@ -26,14 +28,16 @@ export function useTauriEvents() {
             total_latency_ms: number;
           };
           setResult(result);
-          toast.success(`Transcribed in ${result.total_latency_ms}ms`);
+          const { t } = getTranslation(useSettingsStore.getState().uiLanguage);
+          toast.success(t("toast.transcribed", { ms: result.total_latency_ms }));
         }),
       );
 
       unlisteners.push(
         await listen<string>("pipeline-error", (event) => {
           setError(event.payload);
-          toast.error(`Error: ${event.payload}`);
+          const { t } = getTranslation(useSettingsStore.getState().uiLanguage);
+          toast.error(t("toast.error", { message: event.payload }));
         }),
       );
     }

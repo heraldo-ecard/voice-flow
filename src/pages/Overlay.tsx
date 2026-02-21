@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { getTranslation } from "../i18n";
 
 const BAR_COUNT = 18;
 
@@ -37,7 +38,7 @@ function RecordingPill({ levels }: { levels: number[] }) {
   );
 }
 
-function ProcessingPill({ textColor }: { textColor: string }) {
+function ProcessingPill({ textColor, label }: { textColor: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex gap-[3px]">
@@ -58,7 +59,7 @@ function ProcessingPill({ textColor }: { textColor: string }) {
         className="text-[10px] font-medium leading-none"
         style={{ color: textColor, fontFamily: "'DM Sans', sans-serif" }}
       >
-        Processing
+        {label}
       </span>
     </div>
   );
@@ -68,11 +69,15 @@ export default function Overlay() {
   const [state, setState] = useState<string>("recording");
   const [levels, setLevels] = useState<number[]>(new Array(BAR_COUNT).fill(0));
   const [isDark, setIsDark] = useState(true);
+  const [uiLanguage, setUiLanguage] = useState("en");
 
   useEffect(() => {
-    // Load theme from settings
+    // Load theme and ui language from settings
     invoke<string | null>("get_setting", { key: "dark_mode" }).then((val) => {
       setIsDark(val === "true");
+    }).catch(() => {});
+    invoke<string | null>("get_setting", { key: "ui_language" }).then((val) => {
+      if (val) setUiLanguage(val);
     }).catch(() => {});
 
     const unlisteners: Array<() => void> = [];
@@ -100,6 +105,7 @@ export default function Overlay() {
   const isProcessing = ["encoding", "transcribing", "refining", "injecting"].includes(state);
 
   const theme = useMemo(() => getOverlayTheme(isDark), [isDark]);
+  const processingLabel = useMemo(() => getTranslation(uiLanguage).t("overlay.processing"), [uiLanguage]);
 
   return (
     <div
@@ -119,7 +125,7 @@ export default function Overlay() {
         }}
       >
         {isRecording && <RecordingPill levels={levels} />}
-        {isProcessing && <ProcessingPill textColor={theme.processingTextColor} />}
+        {isProcessing && <ProcessingPill textColor={theme.processingTextColor} label={processingLabel} />}
       </div>
     </div>
   );
